@@ -4,7 +4,7 @@ Java线程池是java cocurrent包下提供的类，使用非常方便。本文�
 
 ----
 
-##类结构
+## 类结构
 Executors, ExecutorService, ThreadPoolExecutor等概念，各个类容易混淆，其实类关系整理如图。ExecutorService接口扩展了Executors接口，在基本的execute()方法上，提供了一些线程池管理方法、同步／异步获取线程执行结果的方法。
 ![屏幕快照 2017-06-28 下午11.10.32.png](http://upload-images.jianshu.io/upload_images/4849306-1ab441f48eddd7fc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 通常，我们使用线程池的模版代码如下
@@ -25,7 +25,7 @@ ExecutorService executorService = Executors.newFixedThreadPool(5,
 我们使用的线程池可以分为两类ScheduledExecutorService、ThreadPoolExecutor。实际所有线程池均为其实现类或者wrapper类。所以分析线程池可以从这两类入手。
 
  ---
-##ThreadPoolExecutor
+## ThreadPoolExecutor
 常用的代表有Executors.newFixedThreadPool(),newCachedThreadPool() 等，构造出来的都是设定了不同参数的ThreadPoolExecutor实例。
 ThreadPoolExecutor的核心参数有：
 > * corePoolSize
@@ -55,7 +55,7 @@ ThreadPoolExecutor的核心参数有：
     }
 ```
 
-###execute
+### execute
 ```
 public void execute(Runnable command) {
         if (command == null)
@@ -105,7 +105,7 @@ public void execute(Runnable command) {
   >1. 线程数目>corePoolSize时且队列中有剩余槽位时，task在队列中等待执行，则何时会被worker线程执行？
  >2.线程数目>corePoolSize且队列中无剩余槽位时，task直接由新建一个线程执行（< maxPoolSize），那是否是造成了后提交的task是可能先执行的？
 
-###addWorker
+### addWorker
 ```
 private boolean addWorker(Runnable firstTask, boolean core) {
         retry:
