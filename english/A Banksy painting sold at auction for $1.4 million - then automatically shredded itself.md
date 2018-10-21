@@ -11,3 +11,11 @@ Right then, the paiting's canvas began moving downward, seeming to pass through 
 Branksy later posted a video to Instagram that showed footage of a shredding mechanism being build into the frame. "A few years ago, I secretly built a shredder into a painting," he stated in the video text, "in case it is ever put up into an auction". The video then jumped to clips of the  Friday's auction of Sothebey's, indicating that Branksy - or someone who works with him was there when it happened.
 
 "The urge to destroy is also a creative urge," Branksy captioned the Instagram post.
+
+
+
+### vocabulary
+
+1.auction:   be sold at auctin for
+
+2.shred: 
