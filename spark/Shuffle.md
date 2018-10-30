@@ -1,6 +1,8 @@
-Shuffle
+##job need shuffle
 
-## job need shuffle
+[TOC]
+
+
 
 由上节我们已知，spark中一个job的执行流程可简化为：
 
@@ -25,7 +27,8 @@ val groupRdd = dataRdd.groupBy(r => r.getInt(0))
 val count = groupRdd.count()
 ```
 
-## 1. 构建stage DAG
+### 1. 构建stage DAG
+
 在真正做action之前，我们通过一系列的transformation得到了一个finalRDD，本例中即groupRDD,之后我们在groupRDD上触发一个action,才真正得开始向spark提交一个job.
 
 那么，通过RDD的dependencies，我们已知groupRDD的依赖链：
@@ -72,4 +75,57 @@ ShuffleMapTask看类构成跟ResultTask差不多，主要区别在于runTask方�
 | ResultTask.runTask     | func(context, rdd.iterator(partition, context))              | 对对应的partition数据进行 定义的func 调用 |
 | ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | ShuffleMapTask.runTask | writer=manager.getWrite(dep.shuffleHandle, partitionId, context); writer.write(rdd.iterator(partition, context)) | 根据**shuffleDependency**生成ShuffleWriter,对对应的parition进行shuffle write |
-`
+从上述执行可以看出，ResultTask的核心在与func, ShuffleMapTask的核心在于dep.shuffleHandle，这两者都直接决定了后续task的执行逻辑。而这两者都是通过之前taskBinary里反序列化解析得到的。
+
+回顾下Task的构建过程里, taskBinary里ResultTask包含的就是(Rdd, func ),  而ShuffleMapTask对应则是（Rdd, shuffleDep. 可以说，Shuffle.shuffleDep描述了该shuffle该如何执行的所有核心逻辑。
+
+```scala
+// For ShuffleMapTask, serialize and broadcast (rdd, shuffleDep).
+// For ResultTask, serialize and broadcast (rdd, func).
+val taskBinaryBytes: Array[Byte] = stage match {
+    case stage: ShuffleMapStage =>
+         JavaUtils.bufferToArray(
+            closureSerializer.serialize((stage.rdd, stage.shuffleDep): AnyRef))
+    case stage: ResultStage =>
+          JavaUtils.bufferToArray(closureSerializer.serialize((stage.rdd, stage.func): AnyRef))
+      }
+```
+
+#### 2.3 ShuffleDependency
+
+Shuffle.shuffleDep实现类为ShuffleDependency，这一节我们来看看这个类。
+
+首先一个问题，这个stage.shuffleDep是什么时候生成的？
+
+回到RDD的依赖链，DAG拓扑图就是根据依赖链里的ShuffleDependency进行切割的。所以ShuffleDependency和ShuffleRDD是1对1 的，这是一个ShuffleRDD的固有属性值，每个ShuffleRDD生成的时候，其对应的ShuffleDependency该如何就已经确定了。
+
+```scala
+override def getDependencies: Seq[Dependency[_]] = {
+    val serializer = userSpecifiedSerializer.getOrElse {
+      val serializerManager = SparkEnv.get.serializerManager
+      if (mapSideCombine) {
+        serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[C]])
+      } else {
+        serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[V]])
+      }
+    }
+    List(new ShuffleDependency(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
+  }
+```
+
+回到ShuffleDependency , 它是如何定义了Shuffle该如何执行的？
+
+```scala
+val shuffleHandle: ShuffleHandle = _rdd.context.env.shuffleManager.registerShuffle(
+    shuffleId, _rdd.partitions.length, this)
+```
+
+ShuffleDependency除去从父类中继承的成员变量外，还有一个shuffleHandle,根据当前dependency的一些基本属性以及配置生成不同的ShuffleHandle, ShuffleHandle有以下三种
+
+> 1.  BypassMergeSortShuffleHandle
+>
+> 2. SerializedShuffleHandle
+> 3. BaseShuffleHandle
+
+
+
