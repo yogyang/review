@@ -7,7 +7,6 @@
 
 
 1. Scala-version mismatch : https://github.com/spark-jobserver/spark-jobserver/issues/1074
-
 2. multi sparkcontext : https://issues.apache.org/jira/browse/SPARK-2243
 
 
@@ -20,7 +19,7 @@ https://github.com/jupyter-incubator/sparkmagic
 
 Yarn-client vs. yarn-cluster : https://www.iteblog.com/archives/1223.html
 
-
+https://www.aliyun.com/jiaocheng/439531.html
 
 ### FAQ
 

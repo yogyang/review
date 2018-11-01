@@ -1,6 +1,6 @@
 ### HGOS Startup In Local Mode
 
-1. In this demo, you will learn to install microstrategy hadoop gateway and start up it in local mode on a linux machine. 
+1. In this demo, you will learn to install microstrategy hadoop gateway 
 
 2. At the first step, download the hgos tar to your installation directory.
 
