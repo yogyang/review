@@ -127,5 +127,5 @@ ShuffleDependency除去从父类中继承的成员变量外，还有一个shuffl
 > 2. SerializedShuffleHandle
 > 3. BaseShuffleHandle
 
-
+而在执行ShuffleMapTask时的核心shuffleWriter正是根据不同的handler生成的。
 

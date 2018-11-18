@@ -10,27 +10,25 @@
 
 5. Check whther the Hadoop is installed by *hadoop version*
 
-6. Check whether the Hadoop is running well by *hadoop fs -ls /*
+6. Check whether the Hadoop is running well by the given command
 
-7. Check java verison, hadoop gateway only support local mode for Spark2.3. And Spark2.3 requires java 1.8+
+7. Check java verison, hadoop gateway only support local mode for Spark2.3 which requires jre 8+
 
-8. Now cd into the spark2.3 folder for your local mode startup.
+8. Now go into the spark2.3 folder for your local mode startup.
 
 9. Now you need to generate the hgos-spark.properties to configurate your hadoop gateway. Copy the template configuratoin for local mode by executing the given command, and edit the configuration as your own need. Note if your Hadoop cluster is under kerberos authentication, edit the security setting in your hgos-spark.properties according to your principle.
 
 10. As this hadoop cluster is running with kerberos.  And we have copied the keytab file for user MSTRSVRSvc  to this machine, we edit the setting to make the hadoop gateway can communicate with hadoop cluster. 
 
-11. You can also edit your application name by editting the spark.app.name
-
-12. For local mode, you need to check whther your hadoop is running in High Available (HA) mode. Check this by visiting your cluster manager. e.g.  In Cloudera Manager, Click Main Page → HDFS  → NameNodes→  Federation and High Availability.
+11. For local mode, you need to check whther your hadoop is running in High Available (HA) mode. Check this by visiting your cluster manager. e.g.  In Cloudera Manager, Click Main Page → HDFS  → NameNodes→  Federation and High Availability.
 
     If your Hadoop is running in HA mode,  then copy the Hadoop-related config files to lib/. This is required specifically for local mode startup with Hadoop HA mode.
 
     If your Hadoop is not running in HA mode, just run ./sbin/start-hgos.sh to start the Hadoop gateway.
 
-13. Now  let's check whether the Hadoop is running in HA.
+12. Now  let's check whether the Hadoop is running in HA.
 
-14. Ok, we need to copy the Hadoop-related config . First, find the Hadoop conf folder by *hadoop classpath*.
+13. Ok, we need to copy the Hadoop-related config . First, find the Hadoop conf folder by *hadoop classpath*.
 
     The conf folder is quite obvious. 
 
