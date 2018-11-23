@@ -1,0 +1,750 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>Spark2+ Shuffle</title>
+  <style type="text/css">
+    body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #222;
+  font-size: 100%;
+}
+
+.slide {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 0; right: 0;
+  background-color: #f7f7f7;
+}
+
+.slide-content {
+  width: 800px;
+  height: 600px;
+  overflow: hidden;
+  margin: 80px auto 0 auto;
+  padding: 30px;
+
+  font-weight: 200;
+  font-size: 200%;
+  line-height: 1.375;
+}
+
+.controls {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+}
+
+.arrow {
+  width: 0; height: 0;
+  border: 30px solid #333;
+  float: left;
+  margin-right: 30px;
+
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.prev {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+
+  border-left-width: 0;
+  border-right-width: 50px;
+}
+
+.next {
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+  border-right-color: transparent;
+
+  border-left-width: 50px;
+  border-right-width: 0;
+}
+
+.prev:hover {
+  border-right-color: #888;
+  cursor: pointer;
+}
+
+.next:hover {
+  border-left-color: #888;
+  cursor: pointer;
+}
+
+h1 {
+  font-size: 300%;
+  line-height: 1.2;
+  text-align: center;
+  margin: 170px 0 0;
+}
+
+h2 {
+  font-size: 100%;
+  line-height: 1.2;
+  margin: 5px 0;
+  text-align: center;
+  font-weight: 200;
+}
+
+h3 {
+  font-size: 140%;
+  line-height: 1.2;
+  border-bottom: 1px solid #aaa;
+  margin: 0;
+  padding-bottom: 15px;
+}
+
+ul {
+  padding: 20px 0 0 60px;
+  font-weight: 200;
+  line-height: 1.375;
+}
+
+.author h1 {
+  font-size: 170%;
+  font-weight: 200;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.author h3 {
+  font-weight: 100;
+  text-align: center;
+  font-size: 95%;
+  border: none;
+}
+
+a {
+  text-decoration: none;
+  color: #44a4dd;
+}
+
+a:hover {
+  color: #66b5ff;
+}
+
+pre {
+  font-size: 60%;
+  line-height: 1.3;
+}
+
+.progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 1;
+}
+
+.progress-bar {
+  width: 0%;
+  height: 3px;
+  background-color: #b4b4b4;
+
+  -webkit-transition: width 0.05s ease-out;
+  -moz-transition: width 0.05s ease-out;
+  -o-transition: width 0.05s ease-out;
+  transition: width 0.05s ease-out;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 850px) {
+
+  body {
+    font-size: 70%;
+  }
+
+  .slide-content {
+    width: auto;
+  }
+
+  img {
+    width: 100%;
+  }
+
+  h1 {
+    margin-top: 120px;
+  }
+
+  .prev, .prev:hover {
+    border-right-color: rgba(135, 135, 135, 0.5);
+  }
+
+  .next, .next:hover {
+    border-left-color: rgba(135, 135, 135, 0.5);
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 50%;
+    overflow: hidden;
+  }
+
+  .slide-content {
+    padding: 10px;
+    margin-top: 10px;
+    height: 340px;
+  }
+
+  h1 {
+    margin-top: 50px;
+  }
+
+  ul {
+    padding-left: 25px;
+  }
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+  }
+
+  @page {
+    size: letter;
+  }
+
+  .hidden {
+    display: inline;
+  }
+
+  html {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  body {
+    margin: 0 auto !important;
+    border: 0;
+    padding: 0;
+    float: none !important;
+    overflow: visible;
+    background: none !important;
+    font-size: 52%;
+  }
+
+  .progress, .controls {
+    display: none;
+  }
+
+  .slide {
+    position: static;
+  }
+
+  .slide-content {
+    border: 1px solid #222;
+    margin-top: 0;
+    margin-bottom: 40px;
+    height: 3.5in;
+    overflow: visible;
+  }
+
+  .slide:nth-child(even) {
+    /* 2 slides per page */
+    page-break-before: always;
+  }
+}
+
+/*
+
+github.com style (c) Vasily Polovnyov <vast@whiteants.net>
+
+*/
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #333;
+  background: #f8f8f8;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #998;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #333;
+  font-weight: bold;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr {
+  color: #008080;
+}
+
+.hljs-string,
+.hljs-doctag {
+  color: #d14;
+}
+
+.hljs-title,
+.hljs-section,
+.hljs-selector-id {
+  color: #900;
+  font-weight: bold;
+}
+
+.hljs-subst {
+  font-weight: normal;
+}
+
+.hljs-type,
+.hljs-class .hljs-title {
+  color: #458;
+  font-weight: bold;
+}
+
+.hljs-tag,
+.hljs-name,
+.hljs-attribute {
+  color: #000080;
+  font-weight: normal;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: #009926;
+}
+
+.hljs-symbol,
+.hljs-bullet {
+  color: #990073;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #0086b3;
+}
+
+.hljs-meta {
+  color: #999;
+  font-weight: bold;
+}
+
+.hljs-deletion {
+  background: #fdd;
+}
+
+.hljs-addition {
+  background: #dfd;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+
+  </style>
+</head>
+<body>
+    <div class="progress">
+    <div class="progress-bar"></div>
+  </div>
+
+  <div class="slide" id="slide-1">
+    <section class="slide-content"><h1 id="spark2-shuffle">Spark2+ Shuffle</h1>
+<h2 id="basic-workflow-and-shuffle">Basic workflow and shuffle</h2>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-2">
+    <section class="slide-content"><h3 id="workflow">WorkFlow</h3>
+<p>Let&#39;s start with basic job.</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">val</span> dataRdd = sc.parallelize(data, <span class="hljs-number">3</span>)
+dataRdd.count()
+</code></pre>
+<p>In SparkContext</p>
+<pre><code>def runJob[T, U: ClassTag](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) =&gt; U,
+      partitions: Seq[Int],
+      resultHandler: (Int, U) =&gt; Unit): 
+</code></pre><p>In DAGScheduler</p>
+<pre><code>def submitJob[T, U](
+      rdd: RDD[T],
+      func: (TaskContext, Iterator[T]) =&gt; U,
+      partitions: Seq[Int],
+      callSite: CallSite,
+      resultHandler: (Int, U) =&gt; Unit,
+      properties: Properties): JobWaiter[U]
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-3">
+    <section class="slide-content"><h3 id="simple-view-from-driver">Simple View From Driver</h3>
+<p><img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE85775074b5e88906b00890485e61318c/3619?ynotemdtimestamp=1542681791032" alt="drawing" width="800" height="350"/></p>
+<pre><code>1. driver端，DAGScheduler 会对job进行提交，且对job生成一个JobWaiter, 而JobWaiter的阻塞和唤醒就分别对应着job的阻塞和完成。
+2. rdd : 描述了之前所有的transformation依赖关系
+3. func : 描述了你的算子操作
+4. parititions: 计算哪些parition
+5.resultHandler: 每个partition的计算结果如何汇总
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-4">
+    <section class="slide-content"><h3 id="workflow-over-cluster">WorkFlow Over Cluster</h3>
+<p><img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE0caf9a20da2f000e5c5bacafb1aa15db/4005?ynotemdtimestamp=1542685679547" alt="drawing" width="800" height="400"/></p>
+<pre><code>step 1. stage拓扑图中只有一个ResultStage
+step 3. executor 执行task之后，将结果直接发回给driver
+step 4. driver在接收到所有的task的结果后，对JobWaiter进行唤醒， 在driver端对所有的result 按照result handler进行处理。
+
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-5">
+    <section class="slide-content"><h3 id="a-job-with-shuffle">A job with Shuffle</h3>
+<p>basic code</p>
+<pre><code>val dataRdd = context.parallelize(data, 3)
+val groupRdd = dataRdd.groupBy(r =&gt; r.getInt(0))
+val count = groupRdd.count()
+</code></pre><p>basic workflow </p>
+<pre><code>create stage 
+-&gt; submit stage
+-&gt; stage to tasks 
+-&gt; task execute 
+-&gt; result send back 
+-&gt; next stage
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-6">
+    <section class="slide-content"><h3 id="create-stage-dag">Create Stage DAG</h3>
+<pre><code>在真正做action之前，我们通过一系列的transformation得到了一个finalRDD，本例中即groupRDD,之后我们在groupRDD上触发一个action,才真正得开始向spark提交一个job.
+
+通过RDD的dependencies，我们已知groupRDD的依赖链
+</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/rdd_dependency.png?token=AAAENajQcZ7jU-jnuukuCbP7pYmKuj1Bks5b_VqNwA%3D%3D" alt="drawing" width="800" height="150"/></p>
+<pre><code>构建finalStage的时候，DAGScheduler从finalRDD(groupRDD)往前推算，
+查看是否需要建partentStages, 
+判断原则是依赖链上遇到ShuffleDependency即生成一个ShuffleStageMap
+</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</section>
+  </div>
+  <div class="slide hidden  " id="slide-7">
+    <section class="slide-content"><h3 id="submit-stage">submit stage</h3>
+<pre><code>由上述可知，对于示例程序来说，DAG拓扑图构成为ShuffleMapStage-&gt;ResultStage. 
+DAG 拓扑图生成后，我们来到step2 - submitStage(finalStage).
+
+submitStage的流程之前说过, 核心归结为一句话：
+Submits stage, but first recursively submits any missing parents
+
+先检查该stage是否有依赖的parentStage没有执行，
+若有 -&gt;  先submit 所有的parentStage, 该stage 加入waitingStage set中
+若无 -&gt;  直接submit该stage
+
+本例中，由于父stage stage_1的存在，程序会先submit stage_0.
+注意跟之前no_shuffle_job 的submit stage最大一个区别来了：
+
+提交的stage为 **ShuffleMapStage**
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-8">
+    <section class="slide-content"><h3 id="stage-to-tasks">stage to tasks</h3>
+<h4 id="resultstage-resulttask">ResultStage -&gt; ResultTask</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/resultstge2task.png?token=AAAENYQ0CgayTByryizvqhsA6aQwCpu-ks5b_1tawA%3D%3D" alt="resultstage-&gt; task"></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-9">
+    <section class="slide-content"><h3 id="stage-to-tasks">stage to tasks</h3>
+<h4 id="resulttask">ResultTask</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/resultTask.jpg?token=AAAENXtYLnlRud7EsKSnwCJ59sE5ITmRks5b_1uOwA%3D%3D" alt="drawing" width="800" height="300"/></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-10">
+    <section class="slide-content"><h3 id="shuffle">Shuffle</h3>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle.png?token=AAAENQ-_3dUuSoN8B8Oh8L_ME7I0-Q7Iks5b_1vJwA%3D%3D" alt="shuffle"></p>
+<pre><code>数据的重分布，重点在乎数据，不在于一个计算结果
+
+Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
+</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-11">
+    <section class="slide-content"><h4 id="shufflemaptask">ShuffleMapTask</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffleMapTask.jpg?token=AAAENb2cIqjzHkERDWhibsKvynyYcvC0ks5b_1w-wA%3D%3D" alt="drawing" width="800" height="300"/></p>
+<pre><code>1. MapStatus: Includes the block manager address that the task ran on as well as the sizes of outputs for each reducer, for passing on to the reduce tasks.
+2. ShuffleWriter
+3. ShuffleDependency
+
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-12">
+    <section class="slide-content"><h4 id="shuffledependency">ShuffleDependency</h4>
+<pre><code>首先一个问题，这个stage.shuffleDep是什么时候生成的？
+
+回到RDD的依赖链，DAG拓扑图就是根据依赖链里的ShuffleDependency进行切割的。
+所以ShuffleDependency和ShuffleRDD是1对1 的，
+这是一个ShuffleRDD的固有属性值，
+每个ShuffleRDD生成的时候，其对应的ShuffleDependency该如何就已经确定了。
+</code></pre><pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getDependencies</span></span>: <span class="hljs-type">Seq</span>[<span class="hljs-type">Dependency</span>[_]] = {
+    <span class="hljs-keyword">val</span> serializer = userSpecifiedSerializer.getOrElse {
+      <span class="hljs-keyword">val</span> serializerManager = <span class="hljs-type">SparkEnv</span>.get.serializerManager
+      <span class="hljs-keyword">if</span> (mapSideCombine) {
+        serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">C</span>]])
+      } <span class="hljs-keyword">else</span> {
+        serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">V</span>]])
+      }
+    }
+    <span class="hljs-type">List</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">ShuffleDependency</span>(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
+  }
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-13">
+    <section class="slide-content"><h4 id="shufflewriter">ShuffleWriter</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle_writer_general.png?token=AAAENednk2Fsshfi6DFq38s1GqD5EJPyks5b_11LwA%3D%3D" alt="shufflewirterGenral"></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-14">
+    <section class="slide-content"><h4 id="shufflewriter">ShuffleWriter</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffledependency2writer.png?token=AAAENf0wffL5NTxnFXVfNxWieOn-R5j3ks5b__eGwA%3D%3D" alt="drawing" width="800" height="150"/></p>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shufflewriter_dispatch.png?token=AAAENUa7M3nPF7Fjcfwlp7wJ22BCmzysks5b_11rwA%3D%3D" alt="drawing" width="800" height="350"/></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-15">
+    <section class="slide-content"><h4 id="bypassmergesortshufflewriter">BypassMergeSortShuffleWriter</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmerge.png?token=AAAENRdVXXgi5da69uzJjaL-CvbtH6_Wks5b__fFwA%3D%3D" alt="drawing" width="1000" height="300"/></p>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmergeShufflerWriter.png?token=AAAENY5Qhoz6Crj1vdySLbJTTPt-tfK0ks5b_12xwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h4 id="sortshufflewriter">SortShuffleWriter</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/sortshuffle.png?token=AAAENeNV4sLf1t35bYrcUZj_kbslrK6Kks5b__fmwA%3D%3D" alt="drawing" width="1000" height="400"/></p>
+<pre><code>1. algorithm : external sort , heap sort
+2. support : aggregation, sort by (partitonId, order)
+</code></pre><p><a href="https://www.cnblogs.com/itboys/p/9201750.html">detail_url</a></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-17">
+    <section class="slide-content"><h4 id="unsafeshufflewriter">UnSafeShuffleWriter</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/unsafeShuffle.png?token=AAAENXslXtNJ0s3TC0X8nHvj-TnocILFks5b__gAwA%3D%3D" alt="drawing" width="1000" height="500"/></p>
+<pre><code>1. copy bytes，avoid serialize and deserialize
+2. no aggeration
+</code></pre><p><a href="https://www.cnblogs.com/itboys/p/9201750.html">Reference</a></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-18">
+    <section class="slide-content"><h4 id="map-to-reduce">Map to Reduce</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/mapoutput2driver.png?token=AAAENbJDsJSWZ0FJv3UG8C7xyZ6E-4vdks5b_4HZwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+<pre><code>Now ShuffleStage done,  Go to submit next stage, in our example, it&#39;s a ResultStage
+</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/nextstagshuffleRdd.compute.png?token=AAAENT7zu7SYnPAd55hVQ9slyTIlmIBcks5b_4HvwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+<p><strong>ShuffleReader</strong></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-19">
+    <section class="slide-content"><h4 id="blockstoreshufflereader">BlockStoreShuffleReader</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_Logic.png?token=AAAENfMvV0RkffINYq27bQxdumRUhsPbks5b_4IYwA%3D%3D" alt="drawing" width="800" height="500"/></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-20">
+    <section class="slide-content"><h4 id="blockstoreshufflereader">BlockStoreShuffleReader</h4>
+<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_more_specific.png?token=AAAENRMk8B1zPfR5Cpuid_Yzzxs3LGV0ks5b_4I8wA%3D%3D" alt="drawing" width="800" height="500"/></p>
+</section>
+  </div>
+  <div class="slide hidden -" id="slide-21">
+    <section class="slide-content"><h4 id="blockstoreshufflereader-aggeration-sort-">BlockStoreShuffleReader -  Aggeration ? Sort ?</h4>
+<p>Same to SortShuffleWriter</p>
+<p>Reference : <a href="https://www.jianshu.com/p/50278b0a0050">shuffle_reader</a></p>
+</section>
+  </div>
+  <div class="slide hidden --" id="slide-22">
+    <section class="slide-content"><h4 id="question">Question</h4>
+<p>Reference:</p>
+<p><a href="https://0x0fff.com/spark-architecture-shuffle/">spark-shuffle,some dicusson on writer compare and memory setting, a little old</a></p>
+<p><a href="https://www.jianshu.com/p/50278b0a0050">shuffle_reader, detail go through code</a></p>
+<p><a href="https://spark-internals.books.yourtion.com/markdown/4-shuffleDetails.html">A whole gitbook, comparison with hadoop, a little old</a></p>
+<p><a href="https://www.cnblogs.com/itboys/p/9201750.html">detail on shufflewriter, old but detail, almost work for spark2</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/analytics/library/ba-cn-apache-spark-memory-management/index.html">memory discussion</a></p>
+</section>
+  </div>
+  <div class="slide hidden author-slide" id="slide-23">
+    <section class="slide-content"><div class="author">
+  <h1 class="name">Yujia Yang</h1>
+    <h3 class="twitter">
+      <a href="http://twitter.com/@none">@none</a>
+    </h3>
+    <h3 class="url">
+      <a href="https://github.com/jdan/cleaver">https://github.com/jdan/cleaver</a>
+    </h3>
+</div>
+</section>
+  </div>
+
+  <div class="controls">
+    <div class="arrow prev"></div>
+    <div class="arrow next"></div>
+  </div>
+
+
+  <script type="text/javascript">
+    /**
+ * Returns the current page number of the presentation.
+ */
+function currentPosition() {
+  return parseInt(document.querySelector('.slide:not(.hidden)').id.slice(6));
+}
+
+
+/**
+ * Navigates forward n pages
+ * If n is negative, we will navigate in reverse
+ */
+function navigate(n) {
+  var position = currentPosition();
+  var numSlides = document.getElementsByClassName('slide').length;
+
+  /* Positions are 1-indexed, so we need to add and subtract 1 */
+  var nextPosition = (position - 1 + n) % numSlides + 1;
+
+  /* Normalize nextPosition in-case of a negative modulo result */
+  nextPosition = (nextPosition - 1 + numSlides) % numSlides + 1;
+
+  document.getElementById('slide-' + position).classList.add('hidden');
+  document.getElementById('slide-' + nextPosition).classList.remove('hidden');
+
+  updateProgress();
+  updateURL();
+  updateTabIndex();
+}
+
+
+/**
+ * Updates the current URL to include a hashtag of the current page number.
+ */
+function updateURL() {
+  try {
+    window.history.replaceState({} , null, '#' + currentPosition());
+  } catch (e) {
+    window.location.hash = currentPosition();
+  }
+}
+
+
+/**
+ * Sets the progress indicator.
+ */
+function updateProgress() {
+  var progressBar = document.querySelector('.progress-bar');
+
+  if (progressBar !== null) {
+    var numSlides = document.getElementsByClassName('slide').length;
+    var position = currentPosition() - 1;
+    var percent = (numSlides === 1) ? 100 : 100 * position / (numSlides - 1);
+    progressBar.style.width = percent.toString() + '%';
+  }
+}
+
+
+/**
+ * Removes tabindex property from all links on the current slide, sets
+ * tabindex = -1 for all links on other slides. Prevents slides from appearing
+ * out of control.
+ */
+function updateTabIndex() {
+  var allLinks = document.querySelectorAll('.slide a');
+  var position = currentPosition();
+  var currentPageLinks = document.getElementById('slide-' + position).querySelectorAll('a');
+  var i;
+
+  for (i = 0; i < allLinks.length; i++) {
+    allLinks[i].setAttribute('tabindex', -1);
+  }
+
+  for (i = 0; i < currentPageLinks.length; i++) {
+    currentPageLinks[i].removeAttribute('tabindex');
+  }
+}
+
+/**
+ * Determines whether or not we are currently in full screen mode
+ */
+function isFullScreen() {
+  return document.fullscreenElement ||
+         document.mozFullScreenElement ||
+         document.webkitFullscreenElement ||
+         document.msFullscreenElement;
+}
+
+/**
+ * Toggle fullScreen mode on document element.
+ * Works on chrome (>= 15), firefox (>= 9), ie (>= 11), opera(>= 12.1), safari (>= 5).
+ */
+function toggleFullScreen() {
+  /* Convenient renames */
+  var docElem = document.documentElement;
+  var doc = document;
+
+  docElem.requestFullscreen =
+      docElem.requestFullscreen ||
+      docElem.msRequestFullscreen ||
+      docElem.mozRequestFullScreen ||
+      docElem.webkitRequestFullscreen.bind(docElem, Element.ALLOW_KEYBOARD_INPUT);
+
+  doc.exitFullscreen =
+      doc.exitFullscreen ||
+      doc.msExitFullscreen ||
+      doc.mozCancelFullScreen ||
+      doc.webkitExitFullscreen;
+
+  isFullScreen() ? doc.exitFullscreen() : docElem.requestFullscreen();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Update the tabindex to prevent weird slide transitioning
+  updateTabIndex();
+
+  // If the location hash specifies a page number, go to it.
+  var page = window.location.hash.slice(1);
+  if (page) {
+    navigate(parseInt(page) - 1);
+  }
+
+  document.onkeydown = function (e) {
+    var kc = e.keyCode;
+
+    // left, down, H, J, backspace, PgUp - BACK
+    // up, right, K, L, space, PgDn - FORWARD
+    // enter - FULLSCREEN
+    if (kc === 37 || kc === 40 || kc === 8 || kc === 72 || kc === 74 || kc === 33) {
+      navigate(-1);
+    } else if (kc === 38 || kc === 39 || kc === 32 || kc === 75 || kc === 76 || kc === 34) {
+      navigate(1);
+    } else if (kc === 13) {
+      toggleFullScreen();
+    }
+  };
+
+  if (document.querySelector('.next') && document.querySelector('.prev')) {
+    document.querySelector('.next').onclick = function (e) {
+      e.preventDefault();
+      navigate(1);
+    };
+
+    document.querySelector('.prev').onclick = function (e) {
+      e.preventDefault();
+      navigate(-1);
+    };
+  }
+});
+
+
+  </script>
+</body>
+</html>

@@ -129,3 +129,21 @@ ShuffleDependency除去从父类中继承的成员变量外，还有一个shuffl
 
 而在执行ShuffleMapTask时的核心shuffleWriter正是根据不同的handler生成的。
 
+#### 2.4 ShuffleWriter
+
+在Spark 2.0+ 以后，Spark提供了三种shuffleWriter, BypassMergeSortShuffleWriter,UnsafeShuffleWriter,SortShuffleWriter.分别对应这上述三种handler. 
+
+首先对于一个shuffle来说，数据的处理是分成了两步的，即map和reduce。 最简单的例子，比如([a1,b1,c1],[a2,b2,c2], [a3,b3,c3]
+1. write: 也就是对应着map这个概念，map端一个partiton中的数据根据你的函数策略会对应成
+![屏幕快照 2018-11-19 下午11.35.17](/Users/yoga/Desktop/屏幕快照 2018-11-19 下午11.35.17.png)
+
+而整个逻辑下推，可以得到如下shufflewriter的生成策略：
+
+![屏幕快照 2018-11-19 下午11.31.25](/Users/yoga/Desktop/屏幕快照 2018-11-19 下午11.31.25.png)
+下面对应每个wirter我们来分别描述。
+
+
+
+#####  BypassMergeSortShuffleWriter
+该writer的策略为
+![屏幕快照 2018-11-19 下午11.43.02](/Users/yoga/Desktop/屏幕快照 2018-11-19 下午11.43.02.png)
