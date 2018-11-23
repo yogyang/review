@@ -19,8 +19,8 @@
 }
 
 .slide-content {
-  width: 1000px;
-  height: 800px;
+  width: 800px;
+  height: 600px;
   overflow: hidden;
   margin: 80px auto 0 auto;
   padding: 30px;
@@ -377,23 +377,23 @@ dataRdd.count()
 </code></pre>
 <p>In SparkContext</p>
 <pre><code>def runJob[T, U: ClassTag](
-      rdd: RDD[T],
-      func: (TaskContext, Iterator[T]) =&gt; U,
-      partitions: Seq[Int],
-      resultHandler: (Int, U) =&gt; Unit): 
+rdd: RDD[T],
+func: (TaskContext, Iterator[T]) =&gt; U,
+partitions: Seq[Int],
+resultHandler: (Int, U) =&gt; Unit): 
 </code></pre><p>In DAGScheduler</p>
 <pre><code>def submitJob[T, U](
-      rdd: RDD[T],
-      func: (TaskContext, Iterator[T]) =&gt; U,
-      partitions: Seq[Int],
-      callSite: CallSite,
-      resultHandler: (Int, U) =&gt; Unit,
-      properties: Properties): JobWaiter[U]
+rdd: RDD[T],
+func: (TaskContext, Iterator[T]) =&gt; U,
+partitions: Seq[Int],
+callSite: CallSite,
+resultHandler: (Int, U) =&gt; Unit,
+properties: Properties): JobWaiter[U]
 </code></pre></section>
   </div>
   <div class="slide hidden" id="slide-3">
     <section class="slide-content"><h3 id="simple-view-from-driver">Simple View From Driver</h3>
-<p><img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE85775074b5e88906b00890485e61318c/3619?ynotemdtimestamp=1542681791032" alt="drawing" width="800" height="350"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/simpleviewfromdriver.png" alt="drawing" width="800" height="350"/></p>
 <pre><code>1. driver端，DAGScheduler 会对job进行提交，且对job生成一个JobWaiter, 而JobWaiter的阻塞和唤醒就分别对应着job的阻塞和完成。
 2. rdd : 描述了之前所有的transformation依赖关系
 3. func : 描述了你的算子操作
@@ -403,7 +403,7 @@ dataRdd.count()
   </div>
   <div class="slide hidden" id="slide-4">
     <section class="slide-content"><h3 id="workflow-over-cluster">WorkFlow Over Cluster</h3>
-<p><img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE0caf9a20da2f000e5c5bacafb1aa15db/4005?ynotemdtimestamp=1542685679547" alt="drawing" width="800" height="400"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/cluster_view_job.png" alt="drawing" width="800" height="400"/></p>
 <pre><code>step 1. stage拓扑图中只有一个ResultStage
 step 3. executor 执行task之后，将结果直接发回给driver
 step 4. driver在接收到所有的task的结果后，对JobWaiter进行唤醒， 在driver端对所有的result 按照result handler进行处理。
@@ -430,11 +430,11 @@ val count = groupRdd.count()
 <pre><code>在真正做action之前，我们通过一系列的transformation得到了一个finalRDD，本例中即groupRDD,之后我们在groupRDD上触发一个action,才真正得开始向spark提交一个job.
 
 通过RDD的dependencies，我们已知groupRDD的依赖链
-</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/rdd_dependency.png?token=AAAENajQcZ7jU-jnuukuCbP7pYmKuj1Bks5b_VqNwA%3D%3D" alt="drawing" width="800" height="150"/></p>
+</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/rdd_dependency.png" alt="drawing" width="800" height="150"/></p>
 <pre><code>构建finalStage的时候，DAGScheduler从finalRDD(groupRDD)往前推算，
 查看是否需要建partentStages, 
 判断原则是依赖链上遇到ShuffleDependency即生成一个ShuffleStageMap
-</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/stage_cut.png" alt="drawing" width="800" height="200"/></p>
 </section>
   </div>
   <div class="slide hidden  " id="slide-7">
@@ -458,7 +458,7 @@ Submits stage, but first recursively submits any missing parents
   <div class="slide hidden" id="slide-8">
     <section class="slide-content"><h3 id="stage-to-tasks">stage to tasks</h3>
 <h4 id="resultstage-resulttask">ResultStage -&gt; ResultTask</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/resultstge2task.png?token=AAAENYQ0CgayTByryizvqhsA6aQwCpu-ks5b_1tawA%3D%3D" alt="resultstage-&gt; task"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/resultstge2task.png" alt="resultstage-&gt; task"></p>
 </section>
   </div>
   <div class="slide hidden" id="slide-9">
@@ -469,16 +469,16 @@ Submits stage, but first recursively submits any missing parents
   </div>
   <div class="slide hidden" id="slide-10">
     <section class="slide-content"><h3 id="shuffle">Shuffle</h3>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle.png?token=AAAENQ-_3dUuSoN8B8Oh8L_ME7I0-Q7Iks5b_1vJwA%3D%3D" alt="shuffle"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffle.png" alt="shuffle"></p>
 <pre><code>数据的重分布，重点在乎数据，不在于一个计算结果
 
 Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
-</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/stage_cut.png" alt="drawing" width="800" height="200"/></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-11">
     <section class="slide-content"><h4 id="shufflemaptask">ShuffleMapTask</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffleMapTask.jpg?token=AAAENb2cIqjzHkERDWhibsKvynyYcvC0ks5b_1w-wA%3D%3D" alt="drawing" width="800" height="300"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffleMapTask.jpg" alt="drawing" width="800" height="300"/></p>
 <pre><code>1. MapStatus: Includes the block manager address that the task ran on as well as the sizes of outputs for each reducer, for passing on to the reduce tasks.
 2. ShuffleWriter
 3. ShuffleDependency
@@ -494,39 +494,39 @@ Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
 这是一个ShuffleRDD的固有属性值，
 每个ShuffleRDD生成的时候，其对应的ShuffleDependency该如何就已经确定了。
 </code></pre><pre><code class="lang-scala"><span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getDependencies</span></span>: <span class="hljs-type">Seq</span>[<span class="hljs-type">Dependency</span>[_]] = {
-    <span class="hljs-keyword">val</span> serializer = userSpecifiedSerializer.getOrElse {
-      <span class="hljs-keyword">val</span> serializerManager = <span class="hljs-type">SparkEnv</span>.get.serializerManager
-      <span class="hljs-keyword">if</span> (mapSideCombine) {
-        serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">C</span>]])
-      } <span class="hljs-keyword">else</span> {
-        serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">V</span>]])
-      }
-    }
-    <span class="hljs-type">List</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">ShuffleDependency</span>(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
-  }
+<span class="hljs-keyword">val</span> serializer = userSpecifiedSerializer.getOrElse {
+<span class="hljs-keyword">val</span> serializerManager = <span class="hljs-type">SparkEnv</span>.get.serializerManager
+<span class="hljs-keyword">if</span> (mapSideCombine) {
+serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">C</span>]])
+} <span class="hljs-keyword">else</span> {
+serializerManager.getSerializer(implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">K</span>]], implicitly[<span class="hljs-type">ClassTag</span>[<span class="hljs-type">V</span>]])
+}
+}
+<span class="hljs-type">List</span>(<span class="hljs-keyword">new</span> <span class="hljs-type">ShuffleDependency</span>(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
+}
 </code></pre>
 </section>
   </div>
   <div class="slide hidden -" id="slide-13">
     <section class="slide-content"><h4 id="shufflewriter">ShuffleWriter</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle_writer_general.png?token=AAAENednk2Fsshfi6DFq38s1GqD5EJPyks5b_11LwA%3D%3D" alt="shufflewirterGenral"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffle_writer_general.png" alt="shufflewirterGenral"></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-14">
     <section class="slide-content"><h4 id="shufflewriter">ShuffleWriter</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffledependency2writer.png?token=AAAENf0wffL5NTxnFXVfNxWieOn-R5j3ks5b__eGwA%3D%3D" alt="drawing" width="800" height="150"/></p>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shufflewriter_dispatch.png?token=AAAENUa7M3nPF7Fjcfwlp7wJ22BCmzysks5b_11rwA%3D%3D" alt="drawing" width="800" height="350"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffledependency2writer.png" alt="drawing" width="800" height="150"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shufflewriter_dispatch.png" alt="drawing" width="800" height="350"/></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-15">
     <section class="slide-content"><h4 id="bypassmergesortshufflewriter">BypassMergeSortShuffleWriter</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmerge.png?token=AAAENRdVXXgi5da69uzJjaL-CvbtH6_Wks5b__fFwA%3D%3D" alt="drawing" width="1000" height="300"/></p>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmergeShufflerWriter.png?token=AAAENY5Qhoz6Crj1vdySLbJTTPt-tfK0ks5b_12xwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/bypassmerge.png" alt="drawing" width="1000" height="300"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/bypassmergeShufflerWriter.png" alt="drawing" width="800" height="200"/></p>
 </section>
   </div>
   <div class="slide hidden" id="slide-16">
     <section class="slide-content"><h4 id="sortshufflewriter">SortShuffleWriter</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/sortshuffle.png?token=AAAENeNV4sLf1t35bYrcUZj_kbslrK6Kks5b__fmwA%3D%3D" alt="drawing" width="1000" height="400"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/unsafeShuffle.png" alt="drawing" width="1000" height="400"/></p>
 <pre><code>1. algorithm : external sort , heap sort
 2. support : aggregation, sort by (partitonId, order)
 </code></pre><p><a href="https://www.cnblogs.com/itboys/p/9201750.html">detail_url</a></p>
@@ -534,7 +534,7 @@ Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
   </div>
   <div class="slide hidden -" id="slide-17">
     <section class="slide-content"><h4 id="unsafeshufflewriter">UnSafeShuffleWriter</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/unsafeShuffle.png?token=AAAENXslXtNJ0s3TC0X8nHvj-TnocILFks5b__gAwA%3D%3D" alt="drawing" width="1000" height="500"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/sortshuffle.png" alt="drawing" width="1000" height="500"/></p>
 <pre><code>1. copy bytes，avoid serialize and deserialize
 2. no aggeration
 </code></pre><p><a href="https://www.cnblogs.com/itboys/p/9201750.html">Reference</a></p>
@@ -542,20 +542,20 @@ Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
   </div>
   <div class="slide hidden" id="slide-18">
     <section class="slide-content"><h4 id="map-to-reduce">Map to Reduce</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/mapoutput2driver.png?token=AAAENbJDsJSWZ0FJv3UG8C7xyZ6E-4vdks5b_4HZwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/mapoutput2driver.png" alt="drawing" width="800" height="200"/></p>
 <pre><code>Now ShuffleStage done,  Go to submit next stage, in our example, it&#39;s a ResultStage
-</code></pre><p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/nextstagshuffleRdd.compute.png?token=AAAENT7zu7SYnPAd55hVQ9slyTIlmIBcks5b_4HvwA%3D%3D" alt="drawing" width="800" height="200"/></p>
+</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/nextstagshuffleRdd.compute.png" alt="drawing" width="800" height="200"/></p>
 <p><strong>ShuffleReader</strong></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-19">
     <section class="slide-content"><h4 id="blockstoreshufflereader">BlockStoreShuffleReader</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_Logic.png?token=AAAENfMvV0RkffINYq27bQxdumRUhsPbks5b_4IYwA%3D%3D" alt="drawing" width="800" height="500"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/reader_Logic.png" alt="drawing" width="800" height="500"/></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-20">
     <section class="slide-content"><h4 id="blockstoreshufflereader">BlockStoreShuffleReader</h4>
-<p><img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_more_specific.png?token=AAAENRMk8B1zPfR5Cpuid_Yzzxs3LGV0ks5b_4I8wA%3D%3D" alt="drawing" width="800" height="500"/></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/reader_more_specific.png" alt="drawing" width="800" height="500"/></p>
 </section>
   </div>
   <div class="slide hidden -" id="slide-21">
@@ -572,18 +572,6 @@ Map 和 Reduce =&gt;  ShuffleMapTask  和  ShuffleRdd.compute
 <p><a href="https://spark-internals.books.yourtion.com/markdown/4-shuffleDetails.html">A whole gitbook, comparison with hadoop, a little old</a></p>
 <p><a href="https://www.cnblogs.com/itboys/p/9201750.html">detail on shufflewriter, old but detail, almost work for spark2</a></p>
 <p><a href="https://www.ibm.com/developerworks/cn/analytics/library/ba-cn-apache-spark-memory-management/index.html">memory discussion</a></p>
-</section>
-  </div>
-  <div class="slide hidden author-slide" id="slide-23">
-    <section class="slide-content"><div class="author">
-  <h1 class="name">Yujia Yang</h1>
-    <h3 class="twitter">
-      <a href="http://twitter.com/@none">@none</a>
-    </h3>
-    <h3 class="url">
-      <a href="https://github.com/jdan/cleaver">https://github.com/jdan/cleaver</a>
-    </h3>
-</div>
 </section>
   </div>
 

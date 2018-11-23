@@ -1,8 +1,8 @@
 title: Spark2+ Shuffle
-author:
-  name: Yujia Yang
-  twitter: none
-  url: https://github.com/jdan/cleaver
+author:Yujia Yang
+name: Yujia Yang
+twitter: none
+url: https://github.com/jdan/cleaver
 output: index.html
 controls: true
 
@@ -25,29 +25,29 @@ dataRdd.count()
 In SparkContext
 ```
 def runJob[T, U: ClassTag](
-      rdd: RDD[T],
-      func: (TaskContext, Iterator[T]) => U,
-      partitions: Seq[Int],
-      resultHandler: (Int, U) => Unit): 
+rdd: RDD[T],
+func: (TaskContext, Iterator[T]) => U,
+partitions: Seq[Int],
+resultHandler: (Int, U) => Unit): 
 ```
 
 In DAGScheduler
 
 ```
 def submitJob[T, U](
-      rdd: RDD[T],
-      func: (TaskContext, Iterator[T]) => U,
-      partitions: Seq[Int],
-      callSite: CallSite,
-      resultHandler: (Int, U) => Unit,
-      properties: Properties): JobWaiter[U]
+rdd: RDD[T],
+func: (TaskContext, Iterator[T]) => U,
+partitions: Seq[Int],
+callSite: CallSite,
+resultHandler: (Int, U) => Unit,
+properties: Properties): JobWaiter[U]
 ```
 
 --
 
 ### Simple View From Driver
 
-<img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE85775074b5e88906b00890485e61318c/3619?ynotemdtimestamp=1542681791032" alt="drawing" width="800" height="350"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/simpleviewfromdriver.png" alt="drawing" width="800" height="350"/>
 
 ```
 1. driver端，DAGScheduler 会对job进行提交，且对job生成一个JobWaiter, 而JobWaiter的阻塞和唤醒就分别对应着job的阻塞和完成。
@@ -60,7 +60,7 @@ def submitJob[T, U](
 --
 
 ###  WorkFlow Over Cluster
-<img src="https://note.youdao.com/yws/public/resource/30539e78e5e0de8aa8717d15f6dc2003/xmlnote/WEBRESOURCE0caf9a20da2f000e5c5bacafb1aa15db/4005?ynotemdtimestamp=1542685679547" alt="drawing" width="800" height="400"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/cluster_view_job.png" alt="drawing" width="800" height="400"/>
 
 ```
 step 1. stage拓扑图中只有一个ResultStage
@@ -99,7 +99,7 @@ create stage
 
 通过RDD的dependencies，我们已知groupRDD的依赖链
 ```
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/rdd_dependency.png?token=AAAENajQcZ7jU-jnuukuCbP7pYmKuj1Bks5b_VqNwA%3D%3D" alt="drawing" width="800" height="150"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/rdd_dependency.png" alt="drawing" width="800" height="150"/>
 
 ```
 构建finalStage的时候，DAGScheduler从finalRDD(groupRDD)往前推算，
@@ -107,7 +107,7 @@ create stage
 判断原则是依赖链上遇到ShuffleDependency即生成一个ShuffleStageMap
 ```
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/stage_cut.png" alt="drawing" width="800" height="200"/>
 
 -- 
 
@@ -135,7 +135,7 @@ Submits stage, but first recursively submits any missing parents
 
 #### ResultStage -> ResultTask
 
-![resultstage-> task](https://github.microstrategy.com/raw/yujyang/share/master/spark/resultstge2task.png?token=AAAENYQ0CgayTByryizvqhsA6aQwCpu-ks5b_1tawA%3D%3D)
+![resultstage-> task](https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/resultstge2task.png)
 
 --
 
@@ -149,7 +149,7 @@ Submits stage, but first recursively submits any missing parents
 
 ### Shuffle
 
-![shuffle](https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle.png?token=AAAENQ-_3dUuSoN8B8Oh8L_ME7I0-Q7Iks5b_1vJwA%3D%3D)
+![shuffle](https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffle.png)
 
 ```
 数据的重分布，重点在乎数据，不在于一个计算结果
@@ -157,13 +157,13 @@ Submits stage, but first recursively submits any missing parents
 Map 和 Reduce =>  ShuffleMapTask  和  ShuffleRdd.compute
 ```
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/stage_cut.png?token=AAAENUpPgH2F6DdZkpSz66kDQvEYurYdks5b_VtwwA%3D%3D" alt="drawing" width="800" height="200"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/stage_cut.png" alt="drawing" width="800" height="200"/>
 
 ---
 
 ####  ShuffleMapTask
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffleMapTask.jpg?token=AAAENb2cIqjzHkERDWhibsKvynyYcvC0ks5b_1w-wA%3D%3D" alt="drawing" width="800" height="300"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffleMapTask.jpg" alt="drawing" width="800" height="300"/>
 
 ```
 1. MapStatus: Includes the block manager address that the task ran on as well as the sizes of outputs for each reducer, for passing on to the reduce tasks.
@@ -186,44 +186,44 @@ Map 和 Reduce =>  ShuffleMapTask  和  ShuffleRdd.compute
 
 ```scala
 override def getDependencies: Seq[Dependency[_]] = {
-    val serializer = userSpecifiedSerializer.getOrElse {
-      val serializerManager = SparkEnv.get.serializerManager
-      if (mapSideCombine) {
-        serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[C]])
-      } else {
-        serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[V]])
-      }
-    }
-    List(new ShuffleDependency(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
-  }
+val serializer = userSpecifiedSerializer.getOrElse {
+val serializerManager = SparkEnv.get.serializerManager
+if (mapSideCombine) {
+serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[C]])
+} else {
+serializerManager.getSerializer(implicitly[ClassTag[K]], implicitly[ClassTag[V]])
+}
+}
+List(new ShuffleDependency(prev, part, serializer, keyOrdering, aggregator, mapSideCombine))
+}
 ```
 
 ---
 
 #### ShuffleWriter
 
-![shufflewirterGenral](https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffle_writer_general.png?token=AAAENednk2Fsshfi6DFq38s1GqD5EJPyks5b_11LwA%3D%3D)
+![shufflewirterGenral](https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffle_writer_general.png)
 
 ---
 #### ShuffleWriter
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shuffledependency2writer.png?token=AAAENf0wffL5NTxnFXVfNxWieOn-R5j3ks5b__eGwA%3D%3D" alt="drawing" width="800" height="150"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shuffledependency2writer.png" alt="drawing" width="800" height="150"/>
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/shufflewriter_dispatch.png?token=AAAENUa7M3nPF7Fjcfwlp7wJ22BCmzysks5b_11rwA%3D%3D" alt="drawing" width="800" height="350"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/shufflewriter_dispatch.png" alt="drawing" width="800" height="350"/>
 
 ---
 
 #### BypassMergeSortShuffleWriter
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmerge.png?token=AAAENRdVXXgi5da69uzJjaL-CvbtH6_Wks5b__fFwA%3D%3D" alt="drawing" width="1000" height="300"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/bypassmerge.png" alt="drawing" width="1000" height="300"/>
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/bypassmergeShufflerWriter.png?token=AAAENY5Qhoz6Crj1vdySLbJTTPt-tfK0ks5b_12xwA%3D%3D" alt="drawing" width="800" height="200"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/bypassmergeShufflerWriter.png" alt="drawing" width="800" height="200"/>
 
 --
 
 #### SortShuffleWriter
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/sortshuffle.png?token=AAAENeNV4sLf1t35bYrcUZj_kbslrK6Kks5b__fmwA%3D%3D" alt="drawing" width="1000" height="400"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/unsafeShuffle.png" alt="drawing" width="1000" height="400"/>
 
 ```
 1. algorithm : external sort , heap sort
@@ -236,7 +236,7 @@ override def getDependencies: Seq[Dependency[_]] = {
 
 #### UnSafeShuffleWriter
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/unsafeShuffle.png?token=AAAENXslXtNJ0s3TC0X8nHvj-TnocILFks5b__gAwA%3D%3D" alt="drawing" width="1000" height="500"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/sortshuffle.png" alt="drawing" width="1000" height="500"/>
 
 ```
 1. copy bytes，avoid serialize and deserialize
@@ -249,13 +249,13 @@ override def getDependencies: Seq[Dependency[_]] = {
 
 #### Map to Reduce
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/mapoutput2driver.png?token=AAAENbJDsJSWZ0FJv3UG8C7xyZ6E-4vdks5b_4HZwA%3D%3D" alt="drawing" width="800" height="200"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/mapoutput2driver.png" alt="drawing" width="800" height="200"/>
 
 
 ```
 Now ShuffleStage done,  Go to submit next stage, in our example, it's a ResultStage
 ```
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/nextstagshuffleRdd.compute.png?token=AAAENT7zu7SYnPAd55hVQ9slyTIlmIBcks5b_4HvwA%3D%3D" alt="drawing" width="800" height="200"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/nextstagshuffleRdd.compute.png" alt="drawing" width="800" height="200"/>
 
 
 **ShuffleReader**
@@ -264,14 +264,13 @@ Now ShuffleStage done,  Go to submit next stage, in our example, it's a ResultSt
 
 #### BlockStoreShuffleReader
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_Logic.png?token=AAAENfMvV0RkffINYq27bQxdumRUhsPbks5b_4IYwA%3D%3D" alt="drawing" width="800" height="500"/>
-
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/reader_Logic.png" alt="drawing" width="800" height="500"/>
 
 ---
 
 #### BlockStoreShuffleReader
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/reader_more_specific.png?token=AAAENRMk8B1zPfR5Cpuid_Yzzxs3LGV0ks5b_4I8wA%3D%3D" alt="drawing" width="800" height="500"/>
+<img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/reader_more_specific.png" alt="drawing" width="800" height="500"/>
 
 ---
 
