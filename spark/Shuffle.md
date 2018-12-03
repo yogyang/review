@@ -332,3 +332,20 @@ read具体数据读取的流程为：
 
 #### 4.2 Aggeration ? Sort ?
 
+ 当reader拿到数据之后，比如我们定义sql 需要sort by groupId ， 而从readerIterator 获取的数据是多个block之间打乱的，那么，如何保证整个reduce partition0的数据是有序的呢？
+
+或者我们需要对同样的key进行聚合操作，那么这些散落的数据是如何在reader处进行集合的呢？
+
+Spark 2+里在reduce端对数据进行聚合、排序的方法跟sortShuffleReader一样，在代码上都是重用了ExternalSorter，利用hashtable+外部排序的思想，完成对大数据的聚合+排序。
+
+具体可以参见https://www.jianshu.com/p/50278b0a0050
+
+####  Reference
+
+1. my slide :https://fuqiliang.github.io/review/share/spark/
+2. [spark-shuffle,some dicusson on writer compare and memory setting, a little old](https://0x0fff.com/spark-architecture-shuffle/)
+3. [shuffle_reader, detail go through code](https://www.jianshu.com/p/50278b0a0050)
+4. [A whole gitbook, comparison with hadoop, a little old](https://spark-internals.books.yourtion.com/markdown/4-shuffleDetails.html)
+5. [detail on shufflewriter, old but detail, almost work for spark2](https://www.cnblogs.com/itboys/p/9201750.html)
+6. [memory discussion](https://www.ibm.com/developerworks/cn/analytics/library/ba-cn-apache-spark-memory-management/index.html)
+

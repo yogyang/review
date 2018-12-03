@@ -143,7 +143,7 @@ Submits stage, but first recursively submits any missing parents
 
 ####  ResultTask
 
-<img src="https://github.microstrategy.com/raw/yujyang/share/master/spark/resultTask.jpg?token=AAAENXtYLnlRud7EsKSnwCJ59sE5ITmRks5b_1uOwA%3D%3D" alt="drawing" width="800" height="300"/>
+![resultTask](https://raw.githubusercontent.com/fuqiliang/review/master/share/spark/resultTask.jpg)
 
 --
 
