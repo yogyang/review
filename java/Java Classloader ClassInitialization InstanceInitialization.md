@@ -6,7 +6,7 @@
 
 说到Java的类加载，书本(深入理解Java虚拟机)或者其他[参考](http://www.cubrid.org/blog/dev-platform/understanding-jvm-internals)，我们都能知道，Java类加载的过程是分为如下图所示：
 
-![classloader stage](/Users/yujyang/Documents/workspace/review/java/pictures/classloader%20stage.png)
+![classloader stage](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/classloader%20stage.png)
 
 那么问题来了
 
@@ -83,7 +83,7 @@ public static void main(String... args) throws InterruptedException {
 
 我们实际跑一下，为了方便看类加载的信息，加上-verbose
 
-![image-20190113001429978](/Users/yujyang/Library/Application Support/typora-user-images/image-20190113001429978.png)
+![image-20190113001429978](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/Q1.jpg)
 
 这个问题说明了什么呢？
 
