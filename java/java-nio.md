@@ -9,21 +9,22 @@
 传统的Java I/O方式以流(stream)的方式对输入输出进行处理，*面向流* 的 I/O 系统一次一个字节地处理数据。一个输入流产生一个字节的数据，一个输出流消费一个字节的数据。在Java中也就对应着InputStream, OutputStream以及一系列扩展的子类。示例代码
 
 ```
-File file = new File(fileName);  
-InputStream in = null;  
-try {  
-System.out.println("以字节为单位读取文件内容，一次读一个字节：");  
-// 一次读一个字节  
-in = new FileInputStream(file);  
-int tempbyte;  
-while ((tempbyte = in.read()) != -1) {  
-System.out.write(tempbyte);  
-}  
-in.close();  
-} catch (IOException e) {  
-e.printStackTrace();  
-return;  
-}  
+private static void bioRead(String path) throws IOException {
+        FileInputStream in = null;
+
+        try {
+            in = new FileInputStream(path);
+
+            int c;
+            while ((c = in.read()) != -1) {
+                System.out.print(c);
+            }
+        }finally {
+            if (in != null) {
+                in.close();
+            }
+        }
+    }
 ```
 
 注意：

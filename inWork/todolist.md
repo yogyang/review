@@ -14,4 +14,18 @@
 - [ ] Spark shuffle Read
 - [ ] MTDI / Project schema 
   - [ ] SQL Generate
+- [ ] scala constructer parameters: https://stackoverflow.com/questions/18623687/scala-constructor-parameters
+- [ ] Personal
+  - [ ] Hashshell : http://learnyouahaskell.com/chapters
+  - [ ] Scala: https://www.scala-exercises.org/
+- [ ] Dependency refactor
+  - [ ] 1. EmmaRequst? why do we have subrequsts list? why do we have sqllist, it may have problem in SparkSQLloader
+    2. Appscheme jdbcDataSender, 数据不会重复么
+    3. Bde-model-simple datasourcestreaming不可以合在一起么
+    4. 目前emmarequest里的inno-partiontion 这些概念有人用么
+    5. 一些没有用的类现在是否可以删除？？
+  - [ ] 互相依赖，导致build break
+  - [ ] 
+
+
 
