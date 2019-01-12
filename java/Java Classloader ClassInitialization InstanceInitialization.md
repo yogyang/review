@@ -74,7 +74,7 @@ public static void main(String... args) throws InterruptedException {
 
 3. 访问Person类的静态变量s -> 对Person.class进行getstatic -> Person.class的Initializing类初始化
 
-而在完成某个类初始化之前，JVM会执行类的<clinit>，<clinit>即是执行当前类的所有静态变量以及静态code的处理。
+而在完成某个类初始化之前，JVM会执行类的 clinit ， clinit 即是执行当前类的所有静态变量以及静态code的处理。
 那么，至此我们可以分析出 输出台应该输出
 
 ```java
