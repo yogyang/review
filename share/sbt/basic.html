@@ -428,7 +428,9 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
     <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
 <p>a full scope in sbt is formed by a <strong>tuple</strong> of a subproject, a configuration, and a task value:</p>
 <pre><code class="lang-scala"><span class="hljs-type">Provided</span> by:
-[info]     <span class="hljs-type">ProjectRef</span>(uri(<span class="hljs-string">"file:/Users/yoga/Documents/workspace/subModule/"</span>), <span class="hljs-string">"submodule"</span>) / <span class="hljs-type">Compile</span> / sources
+<span class="hljs-type">ProjectRef</span>(uri(<span class="hljs-string">"file:/Users/yoga/Documents/workspace/subModule/"</span>), <span class="hljs-string">"submodule"</span>) /
+<span class="hljs-type">Compile</span> /
+sources
 </code></pre>
 <pre><code class="lang-scala">projA / <span class="hljs-type">Compile</span> / console / scalacOptions
 </code></pre>
@@ -439,27 +441,196 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </section>
   </div>
   <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h3 id="taksengine-custome-task">TaksEngine - Custome Task</h3>
-<pre><code class="lang-scala"><span class="hljs-keyword">val</span> taskSample = taskKey[<span class="hljs-type">String</span>](<span class="hljs-string">"task sample"</span>)
-<span class="hljs-comment">//this is a expression!! not a statement</span>
-<span class="hljs-comment">//this := returns Setting[Task], and a setting in the project settingLIST !!!!</span>
-<span class="hljs-comment">//OH MY GOD!!!!ddddddddddddde</span>
+    <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
+<p>Let&#39;s define a task / setting of ourselves</p>
+<pre><code class="lang-scala"><span class="hljs-comment">//define a task Key</span>
+<span class="hljs-keyword">val</span> taskSample = taskKey[<span class="hljs-type">String</span>](<span class="hljs-string">"task sample"</span>)
+<span class="hljs-comment">// give the task an implemention, we can call it an entry for the key</span>
 taskSample := {
   println(<span class="hljs-string">"this in taskSample, can be executed multiple times"</span>)
   <span class="hljs-string">"Content for TaskSample"</span>
 }
 
+<span class="hljs-comment">// define a setting Key</span>
 <span class="hljs-keyword">val</span> settingSample = settingKey[<span class="hljs-type">String</span>](<span class="hljs-string">"setting sample"</span>)
+<span class="hljs-comment">// give the task an implemention</span>
 settingSample := {
   println(<span class="hljs-string">"this is in settingSample, should be executed once when session starts"</span>)
   <span class="hljs-string">"Content for SettingSample"</span>
 }
-
-
 </code></pre>
 </section>
   </div>
-  <div class="slide hidden author-slide" id="slide-10">
+  <div class="slide hidden" id="slide-10">
+    <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
+<p>Let&#39;s implement another task with name &quot;<strong>taskSample</strong>&quot; but i<strong>n different scope</strong></p>
+<pre><code class="lang-scala"><span class="hljs-type">ThisBuild</span> / settingSample := <span class="hljs-string">"ThisBuild: Content for SettingSample"</span>
+
+<span class="hljs-keyword">val</span> ma = (project in file(<span class="hljs-string">"Ma"</span>)).settings(
+  scalaSource in <span class="hljs-type">Compile</span> := baseDirectory.value / <span class="hljs-string">"src"</span>,
+  javaSource in <span class="hljs-type">Compile</span> := (scalaSource in <span class="hljs-type">Compile</span>).value,
+  taskSample in <span class="hljs-type">Compile</span> := {
+    println(<span class="hljs-string">"MA: this in taskSample, can be executed multiple times"</span>)
+    <span class="hljs-string">"MA: Content for TaskSample"</span>
+  },
+  name := <span class="hljs-string">"MA"</span>
+)
+
+<span class="hljs-keyword">val</span> mb = (project in file(<span class="hljs-string">"Mb"</span>)).settings(
+  scalaSource in <span class="hljs-type">Compile</span> := baseDirectory.value / <span class="hljs-string">"src"</span>,
+  javaSource in <span class="hljs-type">Compile</span> := (scalaSource in <span class="hljs-type">Compile</span>).value,
+  settingSample in <span class="hljs-type">Compile</span> := {
+    println(<span class="hljs-string">"MB: this is in settingSample, should be executed once when session starts"</span>)
+    <span class="hljs-string">"MB: Content for SettingSample"</span>
+  },
+  name := <span class="hljs-string">"MB"</span>
+)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-11">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p><strong>It&#39;s not just  Scala! It&#39;s built on Scala.</strong>   </p>
+<p><a href="https://jazzy.id.au/2012/03/19/three_things_i_had_to_learn_about_scala_before_it_made_sense.html">Three things I had to learn about Scala before it made sense</a></p>
+<p>How do we define dependencies in mvn?</p>
+<pre><code class="lang-mvn">&lt;dependency&gt;
+    &lt;groupId&gt;net.vz.mongodb.jackson&lt;/groupId&gt;
+    &lt;artifactId&gt;mongo-jackson-mapper&lt;/artifactId&gt;
+    &lt;version&gt;1.4.1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden  " id="slide-12">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p>How can we describe a dependency in a scala way?</p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GroupId</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span></span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">artifact</span></span>(artifactId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">Artifact</span>(groupId, artifactId)
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Artifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span></span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">version</span></span>(version: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">VersionedArtifact</span>(groupId, artifactId, version)
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VersionedArtifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span>, val version: <span class="hljs-type">String</span></span>) </span>{
+}
+</code></pre>
+<p>Then we got</p>
+<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>)
+    .artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>)
+    .version(<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-13">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p>Scala methods can be made of <strong>operator characters</strong></p>
+<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GroupId</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span></span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">%</span></span>(artifactId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">Artifact</span>(groupId, artifactId)
+}
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Artifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span></span>) </span>{
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">%</span></span>(version: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">VersionedArtifact</span>(groupId, artifactId, version)
+}
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VersionedArtifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span>, val version: <span class="hljs-type">String</span></span>) </span>{}
+</code></pre>
+<p>Then</p>
+<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).%(<span class="hljs-string">"mongo-jackson-mapper"</span>).%(<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+<p>Omit the <code>.</code></p>
+<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>) % (<span class="hljs-string">"mongo-jackson-mapper"</span>) % (<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-14">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p>Scala lets you <strong>implicitly</strong> <strong>convert</strong> any type to any other type</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+</code></pre>
+<p>Then when we write down below</p>
+<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span> % <span class="hljs-string">"mongo-jackson-mapper"</span> % <span class="hljs-string">"1.4.1"</span>
+</code></pre>
+<p>It&#39;s equal to </p>
+<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden  " id="slide-15">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p> <strong>implicitly convert</strong></p>
+<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+<p>What it looks like is that the <code>String</code> class has a method called <code>artifact</code>. But we know it doesn&#39;t, and the Scala compiler knows it doesn&#39;t. When it sees that, it says &quot;are there any implicit methods available that accept a <code>String</code> as an argument, and return a type that has an <code>artifact</code> method?&quot; And so it finds the <code>groupId</code> method, which matches that criteria, and converts the code to this:</p>
+<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-16">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<p>Theres are all <strong>functions</strong> , the return type are <strong>Def.Setting[T]</strong>  or <strong>Seq[Def.Setting[T]]</strong></p>
+<p>:=   ++   ++=   in </p>
+<p>SO, belows are <strong>expressions</strong>! Not <strong>statements</strong>!</p>
+<pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
+</code></pre>
+<p>This is equal to </p>
+<pre><code class="lang-scala">name.setEntry(<span class="hljs-string">"subModule"</span>)
+</code></pre>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-17">
+    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+<pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
+</code></pre>
+<p>name is an instance of Type <strong>SettingKey</strong></p>
+<p>calls the <strong>function :=</strong></p>
+<p>with <strong>String parameter</strong> &quot;submodule&quot;</p>
+<p>returns a <strong>Setting</strong></p>
+<p><strong>Q: Look back on the build.sbt, try to explain what happened for the build.sbt you defined?</strong></p>
+<pre><code>//this is a expression!! not a statement
+//this := returns Setting[Task], and the return setting is added into the project&#39;s setting list !!!!
+//OH MY GOD!!!!ddddddddddddde
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-18">
+    <section class="slide-content"><h3 id="sbt-project">SBT-Project</h3>
+<p><img src="/Users/yoga/Documents/workspace/review/share/sbt/pics/project-settings.jpg" alt="project-settings"></p>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-19">
+    <section class="slide-content"><h3 id="sbt-user-defined">SBT- User Defined</h3>
+<p><strong>Project is defined by multiple Def.Settings, this settings defined</strong> </p>
+<pre><code>1. what tasks(including setting-task) do we support in this project
+2. what&#39;s unique name for the tasks - the scopes
+3. what&#39;s the dependencies between the tasks
+4. how will the tasks be implemented
+</code></pre><p> <strong>Statement VS Expression</strong></p>
+<pre><code>val settingSample 
+</code></pre><pre><code>:= ++ ++= ...
+should return  Def.Setting[T] or Seq[Def.Setting[T]]
+</code></pre></section>
+  </div>
+  <div class="slide hidden" id="slide-20">
+    <section class="slide-content"><h3 id="aggerate-vs-depend">Aggerate VS Depend</h3>
+<p>aggregate:</p>
+<ul>
+<li>trigger all the tasks of the project you aggregate with</li>
+</ul>
+<p>depend:</p>
+<ul>
+<li>trigger the compile of the project you depend on</li>
+<li>add the compile classes to your class path</li>
+</ul>
+</section>
+  </div>
+  <div class="slide hidden" id="slide-21">
+    <section class="slide-content"><h3 id="what-s-wrong">What&#39;s Wrong</h3>
+</section>
+  </div>
+  <div class="slide hidden author-slide" id="slide-22">
     <section class="slide-content"><div class="author">
   <h1 class="name">Yujia Yang</h1>
     <h3 class="url">
