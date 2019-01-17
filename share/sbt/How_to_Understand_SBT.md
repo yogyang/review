@@ -30,7 +30,7 @@ controls: true
 
 compile  , test ,  sources ……   
 
-![inspect_source](/Users/yoga/Documents/workspace/review/share/sbt/pics/inspect_source.png)
+![inspect_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_source.png)
 
 
 
@@ -42,7 +42,7 @@ The commands you can run are all tasks!
 
 name, scalaSource, javaSource ....
 
-![inspect_name](/Users/yoga/Documents/workspace/review/share/sbt/pics/inspect_name.png)
+![inspect_name](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_name.png)
 
 
 
@@ -78,7 +78,7 @@ name, scalaSource, javaSource ....
 
 Inspect tree sources
 
-![inspect_tree_source](/Users/yoga/Documents/workspace/review/share/sbt/pics/inspect_tree_source.jpg)
+![inspect_tree_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_tree_source.jpg)
 
 
 
@@ -88,7 +88,7 @@ Inspect tree sources
 
 Inspect tree sources -> Change a view to see
 
-![dag](/Users/yoga/Documents/workspace/review/share/sbt/pics/dag.jpg)
+![dag](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/dag.jpg)
 
 
 
@@ -350,7 +350,7 @@ returns a **Setting**
 
 ### SBT-Project
 
-![project-settings](/Users/yoga/Documents/workspace/review/share/sbt/pics/project-settings.jpg)
+![project-settings](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/project-settings.jpg)
 
 --
 
