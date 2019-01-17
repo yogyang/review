@@ -2,7 +2,7 @@ title: Quick Understanding of SBT
 author:
   name: Yujia Yang
   url: http://jordanscales.com
-output: basic.html
+output: index.html
 controls: true
 
 --
