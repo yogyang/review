@@ -391,9 +391,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
   <div class="slide hidden" id="slide-3">
     <section class="slide-content"><h3 id="batch-mode">Batch Mode</h3>
 <pre><code>$ sbt clean compile &quot;testOnly TestA TestB&quot;
-</code></pre><blockquote>
-<p><strong>Note</strong>: Running in batch mode requires JVM spinup and JIT each time, so <strong>your build will run much slower</strong>. For day-to-day coding, we recommend using the sbt shell or Continuous build and test feature described below.</p>
-</blockquote>
+</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png" alt="batch_mode"></p>
 </section>
   </div>
   <div class="slide hidden" id="slide-4">
@@ -577,22 +575,16 @@ settingSample := {
 <p> <strong>implicitly convert</strong></p>
 <pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
 </code></pre>
-<blockquote>
-<p>What it looks like is that the <code>String</code> class has a method called <code>artifact</code>.
-But we know it doesn&#39;t, and the Scala compiler knows it doesn&#39;t.
-When it sees that, it says &quot;are there any implicit methods available that accept a <code>String</code> as an argument, and return a type that has an <code>artifact</code> method?&quot;
-And so it finds the <code>groupId</code> method, which matches that criteria, and converts the code to this:</p>
-</blockquote>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.jpg" alt="inspect_source"></p>
 <pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
 </code></pre>
 </section>
   </div>
   <div class="slide hidden" id="slide-17">
     <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
-<p>Theres are all <strong>functions</strong> </p>
-<p>the return type are <strong>Def.Setting[T]</strong>  or <strong>Seq[Def.Setting[T]]</strong></p>
+<p>Theres are all <strong>functions</strong>  with  return type are <strong>Def.Setting[T]</strong>  or <strong>Seq[Def.Setting[T]]</strong></p>
 <p>:=   ++   ++=   in </p>
-<p>So, belows are <strong>expressions</strong>! Not <strong>statements</strong>!</p>
+<p>Belows are <strong>expressions</strong>! Not <strong>statements</strong>!</p>
 <pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
 </code></pre>
 <p>This is equal to </p>
@@ -604,10 +596,16 @@ And so it finds the <code>groupId</code> method, which matches that criteria, an
     <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
 <pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
 </code></pre>
-<p>name is an instance of Type <strong>SettingKey</strong></p>
-<p>calls the <strong>function :=</strong></p>
-<p>with <strong>String parameter</strong> &quot;submodule&quot;</p>
-<p>returns a <strong>Setting</strong></p>
+<ol>
+<li><p>name is an instance of Type <strong>SettingKey</strong></p>
+</li>
+<li><p>calls the <strong>function :=</strong></p>
+</li>
+<li><p>with <strong>String parameter</strong> &quot;submodule&quot;</p>
+</li>
+<li><p>returns a <strong>Setting</strong></p>
+</li>
+</ol>
 <p><strong>Q: Look back on the build.sbt, try to explain what happened for the build.sbt you defined?</strong></p>
 <pre><code>//this is a expression!! not a statement
 //this := returns Setting[Task], and the return setting is added into the project&#39;s setting list !!!!
@@ -646,7 +644,27 @@ should return  Def.Setting[T] or Seq[Def.Setting[T]]
 </section>
   </div>
   <div class="slide hidden" id="slide-22">
-    <section class="slide-content"><h3 id="what-s-wrong">What&#39;s Wrong</h3>
+    <section class="slide-content"><h3 id="why-does-it-fail-how-to-fix-">Why does it fail? How to fix?</h3>
+<p> In Project/CustomeSettings.scala</p>
+<pre><code class="lang-scala"><span class="hljs-keyword">import</span> sbt.{<span class="hljs-type">Setting</span>, taskKey, settingKey}
+
+<span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">CustomeSettings</span> </span>{
+
+  <span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> currentOs = settingKey[<span class="hljs-type">String</span>](<span class="hljs-string">"The version of Scala used for building."</span>)
+
+  <span class="hljs-comment">//choose the protobuf path according to the os</span>
+  <span class="hljs-keyword">lazy</span> <span class="hljs-keyword">val</span> printCurrentOS = taskKey[<span class="hljs-type">String</span>](<span class="hljs-string">"print the current os type"</span>)
+
+  currentOs := sys.props(<span class="hljs-string">"os.name"</span>)
+
+  printCurrentOS := {
+    <span class="hljs-keyword">val</span> os = currentOs.value
+    println(<span class="hljs-string">s"current build on os:<span class="hljs-subst">${os}</span>"</span>)
+    os
+  }
+
+}
+</code></pre>
 </section>
   </div>
   <div class="slide hidden author-slide" id="slide-23">

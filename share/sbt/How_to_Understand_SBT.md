@@ -39,7 +39,7 @@ controls: true
 $ sbt clean compile "testOnly TestA TestB"
 ```
 
-![batch_mode]{https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png}
+![batch_mode](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png)
 
 
 
@@ -312,7 +312,8 @@ It's equal to
 "net.vz.mongodb.jackson".artifact("mongo-jackson-mapper").version("1.4.1")
 ```
 
-![inspect_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.png)
+![inspect_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.jpg)
+
 
 
 
