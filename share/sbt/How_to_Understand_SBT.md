@@ -7,26 +7,47 @@ controls: true
 
 --
 
-# Quick Start of SBT
+### Quick Start of SBT
 
+<code>The <strong> interactive</strong> build tool</code>
+
+<code> <strong>Define</strong> your tasks in Scala</code>
+
+<code>Run them in <strong>parallel</strong> from sbt's interactive shell </code>
 
 --
 
 ### Interactive Sample
 
- * projects
- * project
- * reload
- * inspect
- * inspect tree
- * < task > 
- * show < task >
+ - projects / project
+
+ - reload
+
+ - inspect / inspect tree
+
+ - < task > / show < task >
+
+ - testOnly / testQuick
+
+[Command line Reference](https://www.scala-sbt.org/1.x/docs/Command-Line-Reference.html)
+
+--
+
+### Batch Mode
+
+```
+$ sbt clean compile "testOnly TestA TestB"
+```
+
+![batch_mode]{https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png}
+
+
 
 --
 
 ### Task Engine - Task
 
-#####  The commands you can run are all tasks!
+#####  The common commands you can run are almost all tasks!
 
 compile  , test ,  sources ……   
 
@@ -38,7 +59,7 @@ compile  , test ,  sources ……
 
 ### Task Engine -Setting
 
-The commands you can run are all tasks!
+#####  The common commands you can run are almost all tasks!
 
 name, scalaSource, javaSource ....
 
@@ -55,7 +76,7 @@ name, scalaSource, javaSource ....
 * Settings can only depend on Settings
 * Tasks can depend on Settings and Tasks
 
-#### Depend
+##### Depend
 
 **.value**
 
@@ -113,8 +134,11 @@ projA / Compile / console / scalacOptions
 
 
 
-* Usage : you want different task result in different configuration, e.g different source files for Compile and Test
-* Look up:  **Delegates**
+<i>Usage : you want different task result in different configuration, e.g different source files for Compile and Test</i>
+
+<i> Look up:  Delegates</i>
+
+
 
 --
 
@@ -146,7 +170,7 @@ settingSample := {
 
 ### TaksEngine - Scope
 
-Let's implement another task with name "**taskSample**" but i**n different scope**
+Let's implement another task with name "**taskSample**" but **in different scope**
 
 ```scala
 ThisBuild / settingSample := "ThisBuild: Content for SettingSample"
@@ -288,9 +312,9 @@ It's equal to
 "net.vz.mongodb.jackson".artifact("mongo-jackson-mapper").version("1.4.1")
 ```
 
+![inspect_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.png)
 
 
-What it looks like is that the `String` class has a method called `artifact`. But we know it doesn't, and the Scala compiler knows it doesn't. When it sees that, it says "are there any implicit methods available that accept a `String` as an argument, and return a type that has an `artifact` method?" And so it finds the `groupId` method, which matches that criteria, and converts the code to this:
 
 ```scala
 groupId("net.vz.mongodb.jackson").artifact("mongo-jackson-mapper").version("1.4.1")
@@ -302,11 +326,11 @@ groupId("net.vz.mongodb.jackson").artifact("mongo-jackson-mapper").version("1.4.
 
 ### SBT- DSL 
 
-Theres are all **functions** , the return type are **Def.Setting[T]**  or **Seq[Def.Setting[T]]**
+Theres are all **functions**  with  return type are **Def.Setting[T]**  or **Seq[Def.Setting[T]]**
 
 :=   ++   ++=   in 
 
-SO, belows are **expressions**! Not **statements**!
+Belows are **expressions**! Not **statements**!
 
 ```scala
 name := "subModule"
@@ -326,13 +350,14 @@ name.setEntry("subModule")
 name := "subModule"
 ```
 
-name is an instance of Type **SettingKey**
+1. name is an instance of Type **SettingKey**
 
-calls the **function :=**
+2. calls the **function :=**
 
-with **String parameter** "submodule"
+3. with **String parameter** "submodule"
 
-returns a **Setting**
+4. returns a **Setting**
+
 
 
 
@@ -391,7 +416,30 @@ depend:
 
 --
 
-### What's Wrong
+### Why does it fail? How to fix?
+
+ In Project/CustomeSettings.scala
+
+```scala
+import sbt.{Setting, taskKey, settingKey}
+
+object CustomeSettings {
+
+  lazy val currentOs = settingKey[String]("The version of Scala used for building.")
+
+  //choose the protobuf path according to the os
+  lazy val printCurrentOS = taskKey[String]("print the current os type")
+
+  currentOs := sys.props("os.name")
+
+  printCurrentOS := {
+    val os = currentOs.value
+    println(s"current build on os:${os}")
+    os
+  }
+
+}
+```
 
 
 
