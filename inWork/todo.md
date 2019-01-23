@@ -1,3 +1,0 @@
-Install folder,
-
-install user
