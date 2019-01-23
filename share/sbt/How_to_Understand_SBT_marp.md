@@ -1,11 +1,4 @@
-title: Quick Understanding of SBT
-author:
-  name: Yujia Yang
-  url: http://jordanscales.com
-output: index.html
-controls: true
 
---
 
 ### Quick Start of SBT
 
@@ -15,7 +8,20 @@ controls: true
 
 <code>Run them in <strong>parallel</strong> from sbt's interactive shell </code>
 
---
+
+
+
+---
+
+### Batch Mode
+
+```
+$ sbt clean compile "testOnly TestA TestB"
+```
+
+![batch_mode](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png)
+
+---
 
 ### Interactive Sample
 
@@ -31,31 +37,21 @@ controls: true
 
 [Command line Reference](https://www.scala-sbt.org/1.x/docs/Command-Line-Reference.html)
 
---
 
-### Batch Mode
-
-```
-$ sbt clean compile "testOnly TestA TestB"
-```
-
-![batch_mode](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png)
-
-
-
---
+---
 
 ### Task Engine - Task
 
 #####  The common commands you can run are almost all tasks!
 
-compile  , test ,  sources â€¦â€¦   
+compile  , test ,  sources  
 
 ![inspect_source](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_source.png)
 
 
 
---
+---
+
 
 ### Task Engine -Setting
 
@@ -67,7 +63,7 @@ name, scalaSource, javaSource ....
 
 
 
---
+---
 
  ### TaskEngine - Setting VS Task
 
@@ -93,7 +89,7 @@ name, scalaSource, javaSource ....
 
 
 
---
+---
 
 ### TaskEngine - DAG
 
@@ -103,7 +99,7 @@ Inspect tree sources
 
 
 
---
+---
 
 ### TaskEngine - DAG
 
@@ -113,7 +109,7 @@ Inspect tree sources -> Change a view to see
 
 
 
---
+---
 
 ### TaksEngine - Scope
 
@@ -140,7 +136,7 @@ projA / Compile / console / scalacOptions
 
 
 
---
+---
 
 ### TaksEngine - Scope
 
@@ -166,11 +162,11 @@ settingSample := {
 
 
 
---
+---
 
 ### TaksEngine - Scope
 
-Let's implement another task with name "**taskSample**" but **in different scope**
+another task with name "**taskSample**" but **in different scope**
 
 ```scala
 ThisBuild / settingSample := "ThisBuild: Content for SettingSample"
@@ -196,9 +192,7 @@ val mb = (project in file("Mb")).settings(
 )
 ```
 
-
-
---
+---
 
 ### SBT- DSL
 
@@ -217,8 +211,7 @@ How do we define dependencies in mvn?
 ```
 
 
-
--- 
+---
 
 ### SBT- DSL
 
@@ -249,7 +242,7 @@ groupId("net.vz.mongodb.jackson")
 
 
 
---
+---
 
 ### SBT- DSL
 
@@ -278,7 +271,7 @@ Omit the `.`
 groupId("net.vz.mongodb.jackson") % ("mongo-jackson-mapper") % ("1.4.1")
 ```
 
---
+---
 
 ### SBT- DSL
 
@@ -302,7 +295,7 @@ It's equal to
 
 
 
--- 
+--- 
 
 ### SBT- DSL 
 
@@ -323,7 +316,7 @@ groupId("net.vz.mongodb.jackson").artifact("mongo-jackson-mapper").version("1.4.
 
 
 
---
+---
 
 ### SBT- DSL 
 
@@ -343,7 +336,7 @@ This is equal to
 name.setEntry("subModule")
 ```
 
---
+---
 
 ### SBT- DSL 
 
@@ -372,13 +365,13 @@ name := "subModule"
 
 
 
---
+---
 
 ### SBT-Project
 
 ![project-settings](https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/project-settings.jpg)
 
---
+---
 
 ### SBT- User Defined
 
@@ -402,7 +395,7 @@ val settingSample
 should return  Def.Setting[T] or Seq[Def.Setting[T]]
 ```
 
---
+---
 
 ### Aggerate VS Depend
 
@@ -415,11 +408,11 @@ depend:
 * trigger the compile of the project you depend on
 * add the compile classes to your class path
 
---
+---
 
-### Why does it fail? How to fix?
+### Why does it fail?
 
-Â In Project/CustomeSettings.scala
+In Project/CustomeSettings.scala
 
 ```scala
 import sbt.{Setting, taskKey, settingKey}
@@ -441,7 +434,6 @@ object CustomeSettings {
 
 }
 ```
-
 
 
 
