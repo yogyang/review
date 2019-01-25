@@ -2,12 +2,9 @@
 
 ### Quick Start of SBT
 
-<code>The <strong> interactive</strong> build tool</code>
-
-<code> <strong>Define</strong> your tasks in Scala</code>
-
-<code>Run them in <strong>parallel</strong> from sbt's interactive shell </code>
-
+> The  interactive **build tool
+> Define** your tasks in Scala
+> Run them in **parallel** from sbt's interactive shell 
 
 
 
