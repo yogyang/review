@@ -45,7 +45,7 @@ NIO 以块的方式处理数据, 一个 *面向块* 的 I/O 系统以块的形�
 
 
 
-![image-20190123224623469](/Users/yoga/Library/Application Support/typora-user-images/image-20190123224623469.png)
+![image-20190123224623469](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/image-20190123224623469.png)
 
 Sample Code From [NIO IBM](https://www.ibm.com/developerworks/cn/education/java/j-nio/j-nio.html)
 
@@ -102,7 +102,7 @@ Sample code的流程就是
 
 既然要写入，那么就需要两个位置点： start-to-write->从哪开始写   end-to-write->最多能写到哪里
 
- ![image-20190123232322469](/Users/yoga/Library/Application Support/typora-user-images/image-20190123232322469.png)
+ ![image-20190123232322469](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/image-20190123232322469.png)
 
 start-to-write : 0 (in clear) 或者 上次写入的后的下一个地址
 
@@ -112,7 +112,7 @@ end-to-write : 最多就能写到数组末尾
 
 既然要读取，同样也需要两个位置点：start-to-read->从哪开始读   end-to-read->最多能读到哪里
 
-![image-20190123233222488](/Users/yoga/Library/Application Support/typora-user-images/image-20190123233222488.png)
+![image-20190123233222488](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/image-20190123233222488.png)
 
 start-to-read : 0
 
@@ -124,7 +124,7 @@ end-to-read: 上次写入的字节数+1 =  写入模式的start-to-write位置�
 
 基于传统I/O设计的server中，会首先有如下模型，建立handler线程池，每个线程处理一个stream流的读写。
 
-![image-20190128221154843](/Users/yoga/Library/Application Support/typora-user-images/image-20190128221154843.png)
+![image-20190128221154843](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/image-20190128221154843.png)
 
 弊端：
 
