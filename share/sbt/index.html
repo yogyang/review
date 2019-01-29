@@ -1,460 +1,174 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-  <title>Quick Understanding of SBT</title>
-  <style type="text/css">
-    body {
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: #222;
-  font-size: 100%;
-}
+<!DOCTYPE html><html lang="en-US"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0"><meta name="apple-mobile-web-app-capable" content="yes"><meta http-equiv="X-UA-Compatible" content="ie=edge"><style>@media screen{body,html{background:#000;height:100%;margin:0;overflow:hidden}.bespoke-marp-parent{bottom:0;left:0;position:absolute;right:0;top:0}.bespoke-marp-parent.bespoke-marp-cursor-inactive{cursor:none}svg.bespoke-marp-slide{height:100%;left:0;pointer-events:none;position:absolute;top:0;width:100%;z-index:-1}svg.bespoke-marp-slide.bespoke-marp-active{pointer-events:auto;z-index:0}.bespoke-progress-parent{background:#222;display:flex;height:5px;width:100%}.bespoke-progress-parent+.bespoke-marp-parent{top:5px}.bespoke-progress-parent .bespoke-progress-bar{flex:0 0 0;background:#0288d1;transition:flex-basis .2s cubic-bezier(0,1,1,1)}}@media print{.bespoke-progress-parent{display:none}.bespoke-marp-parent{top:0}}</style><style>article#presentation > svg > foreignObject > section {
+  width: 1280px;
+  height: 720px;
 
-.slide {
-  position: absolute;
-  top: 0; bottom: 0;
-  left: 0; right: 0;
-  background-color: #f7f7f7;
-}
-
-.slide-content {
-  width: 800px;
-  height: 600px;
+  box-sizing: border-box;
   overflow: hidden;
-  margin: 80px auto 0 auto;
-  padding: 30px;
+  position: relative;
 
-  font-weight: 200;
-  font-size: 200%;
-  line-height: 1.375;
-}
-
-.controls {
+  scroll-snap-align: center center;
+}article#presentation > svg > foreignObject > section::after {
+  bottom: 0;
+  content: attr(data-marpit-pagination);
+  padding: inherit;
+  pointer-events: none;
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-}
-
-.arrow {
-  width: 0; height: 0;
-  border: 30px solid #333;
-  float: left;
-  margin-right: 30px;
-
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-.prev {
-  border-top-color: transparent;
-  border-bottom-color: transparent;
-  border-left-color: transparent;
-
-  border-left-width: 0;
-  border-right-width: 50px;
-}
-
-.next {
-  border-top-color: transparent;
-  border-bottom-color: transparent;
-  border-right-color: transparent;
-
-  border-left-width: 50px;
-  border-right-width: 0;
-}
-
-.prev:hover {
-  border-right-color: #888;
-  cursor: pointer;
-}
-
-.next:hover {
-  border-left-color: #888;
-  cursor: pointer;
-}
-
-h1 {
-  font-size: 300%;
-  line-height: 1.2;
-  text-align: center;
-  margin: 170px 0 0;
-}
-
-h2 {
-  font-size: 100%;
-  line-height: 1.2;
-  margin: 5px 0;
-  text-align: center;
-  font-weight: 200;
-}
-
-h3 {
-  font-size: 140%;
-  line-height: 1.2;
-  border-bottom: 1px solid #aaa;
-  margin: 0;
-  padding-bottom: 15px;
-}
-
-ul {
-  padding: 20px 0 0 60px;
-  font-weight: 200;
-  line-height: 1.375;
-}
-
-.author h1 {
-  font-size: 170%;
-  font-weight: 200;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.author h3 {
-  font-weight: 100;
-  text-align: center;
-  font-size: 95%;
-  border: none;
-}
-
-a {
-  text-decoration: none;
-  color: #44a4dd;
-}
-
-a:hover {
-  color: #66b5ff;
-}
-
-pre {
-  font-size: 60%;
-  line-height: 1.3;
-}
-
-.progress {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  z-index: 1;
-}
-
-.progress-bar {
-  width: 0%;
-  height: 3px;
-  background-color: #b4b4b4;
-
-  -webkit-transition: width 0.05s ease-out;
-  -moz-transition: width 0.05s ease-out;
-  -o-transition: width 0.05s ease-out;
-  transition: width 0.05s ease-out;
-}
-
-.hidden {
+  right: 0;
+}article#presentation > svg > foreignObject > section:not([data-marpit-pagination])::after {
   display: none;
+}/* Normalization */article#presentation > svg > foreignObject > section h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}@page {
+  size: 1280px 720px;
+  margin: 0;
+}@media print {html, body {
+  background-color: #fff;
+  margin: 0;
+  page-break-inside: avoid;
 }
-
-@media (max-width: 850px) {
-
-  body {
-    font-size: 70%;
-  }
-
-  .slide-content {
-    width: auto;
-  }
-
-  img {
-    width: 100%;
-  }
-
-  h1 {
-    margin-top: 120px;
-  }
-
-  .prev, .prev:hover {
-    border-right-color: rgba(135, 135, 135, 0.5);
-  }
-
-  .next, .next:hover {
-    border-left-color: rgba(135, 135, 135, 0.5);
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    font-size: 50%;
-    overflow: hidden;
-  }
-
-  .slide-content {
-    padding: 10px;
-    margin-top: 10px;
-    height: 340px;
-  }
-
-  h1 {
-    margin-top: 50px;
-  }
-
-  ul {
-    padding-left: 25px;
-  }
-}
-
-@media print {
-  * {
-    -webkit-print-color-adjust: exact;
-  }
-
-  @page {
-    size: letter;
-  }
-
-  .hidden {
-    display: inline;
-  }
-
-  html {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  body {
-    margin: 0 auto !important;
-    border: 0;
-    padding: 0;
-    float: none !important;
-    overflow: visible;
-    background: none !important;
-    font-size: 52%;
-  }
-
-  .progress, .controls {
-    display: none;
-  }
-
-  .slide {
-    position: static;
-  }
-
-  .slide-content {
-    border: 1px solid #222;
-    margin-top: 0;
-    margin-bottom: 40px;
-    height: 3.5in;
-    overflow: visible;
-  }
-
-  .slide:nth-child(even) {
-    /* 2 slides per page */
+  article#presentation > svg > foreignObject > section {
     page-break-before: always;
   }
-}
 
-/*
+  article#presentation > svg > foreignObject > section, article#presentation > svg > foreignObject > section * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
 
-github.com style (c) Vasily Polovnyov <vast@whiteants.net>
-
-*/
-
-.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 0.5em;
-  color: #333;
-  background: #f8f8f8;
-}
-
-.hljs-comment,
-.hljs-quote {
-  color: #998;
-  font-style: italic;
-}
-
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-subst {
-  color: #333;
-  font-weight: bold;
-}
-
-.hljs-number,
-.hljs-literal,
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag .hljs-attr {
-  color: #008080;
-}
-
-.hljs-string,
-.hljs-doctag {
-  color: #d14;
-}
-
-.hljs-title,
-.hljs-section,
-.hljs-selector-id {
-  color: #900;
-  font-weight: bold;
-}
-
-.hljs-subst {
-  font-weight: normal;
-}
-
-.hljs-type,
-.hljs-class .hljs-title {
-  color: #458;
-  font-weight: bold;
-}
-
-.hljs-tag,
-.hljs-name,
-.hljs-attribute {
-  color: #000080;
-  font-weight: normal;
-}
-
-.hljs-regexp,
-.hljs-link {
-  color: #009926;
-}
-
-.hljs-symbol,
-.hljs-bullet {
-  color: #990073;
-}
-
-.hljs-built_in,
-.hljs-builtin-name {
-  color: #0086b3;
-}
-
-.hljs-meta {
-  color: #999;
-  font-weight: bold;
-}
-
-.hljs-deletion {
-  background: #fdd;
-}
-
-.hljs-addition {
-  background: #dfd;
-}
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-.hljs-strong {
-  font-weight: bold;
-}
-
-
-  </style>
-</head>
-<body>
-    <div class="progress">
-    <div class="progress-bar"></div>
-  </div>
-
-  <div class="slide" id="slide-1">
-    <section class="slide-content"><h3 id="quick-start-of-sbt">Quick Start of SBT</h3>
-<p><code>The <strong> interactive</strong> build tool</code></p>
-<p><code> <strong>Define</strong> your tasks in Scala</code></p>
-<p><code>Run them in <strong>parallel</strong> from sbt&#39;s interactive shell </code></p>
+  article#presentation > svg[data-marpit-svg] {
+    display: block;
+    height: 100vh;
+    width: 100vw;
+  }
+}article#presentation > svg > foreignObject > section svg[data-marp-fitting=svg]{display:block;height:auto;width:100%}@supports (-ms-ime-align:auto){article#presentation > svg > foreignObject > section svg[data-marp-fitting=svg]{position:static}}article#presentation > svg > foreignObject > section svg[data-marp-fitting=svg].__reflow__{content:""}@supports (-ms-ime-align:auto){article#presentation > svg > foreignObject > section svg[data-marp-fitting=svg].__reflow__{position:relative}}article#presentation > svg > foreignObject > section [data-marp-fitting-svg-content]{display:table;white-space:nowrap}article#presentation > svg > foreignObject > section [data-marp-fitting-svg-content-wrap]{white-space:pre}article#presentation > svg > foreignObject > section img[data-marp-twemoji]{background:transparent;height:1em;margin:0 .05em 0 .1em;vertical-align:-.1em;width:1em}/*!
+ * Marp default theme.
+ *
+ * @theme default
+ */@font-face{font-family:octicons-link;src:url(data:font/woff;charset=utf-8;base64,d09GRgABAAAAAAZwABAAAAAACFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABEU0lHAAAGaAAAAAgAAAAIAAAAAUdTVUIAAAZcAAAACgAAAAoAAQAAT1MvMgAAAyQAAABJAAAAYFYEU3RjbWFwAAADcAAAAEUAAACAAJThvmN2dCAAAATkAAAABAAAAAQAAAAAZnBnbQAAA7gAAACyAAABCUM+8IhnYXNwAAAGTAAAABAAAAAQABoAI2dseWYAAAFsAAABPAAAAZwcEq9taGVhZAAAAsgAAAA0AAAANgh4a91oaGVhAAADCAAAABoAAAAkCA8DRGhtdHgAAAL8AAAADAAAAAwGAACfbG9jYQAAAsAAAAAIAAAACABiATBtYXhwAAACqAAAABgAAAAgAA8ASm5hbWUAAAToAAABQgAAAlXu73sOcG9zdAAABiwAAAAeAAAAME3QpOBwcmVwAAAEbAAAAHYAAAB/aFGpk3jaTY6xa8JAGMW/O62BDi0tJLYQincXEypYIiGJjSgHniQ6umTsUEyLm5BV6NDBP8Tpts6F0v+k/0an2i+itHDw3v2+9+DBKTzsJNnWJNTgHEy4BgG3EMI9DCEDOGEXzDADU5hBKMIgNPZqoD3SilVaXZCER3/I7AtxEJLtzzuZfI+VVkprxTlXShWKb3TBecG11rwoNlmmn1P2WYcJczl32etSpKnziC7lQyWe1smVPy/Lt7Kc+0vWY/gAgIIEqAN9we0pwKXreiMasxvabDQMM4riO+qxM2ogwDGOZTXxwxDiycQIcoYFBLj5K3EIaSctAq2kTYiw+ymhce7vwM9jSqO8JyVd5RH9gyTt2+J/yUmYlIR0s04n6+7Vm1ozezUeLEaUjhaDSuXHwVRgvLJn1tQ7xiuVv/ocTRF42mNgZGBgYGbwZOBiAAFGJBIMAAizAFoAAABiAGIAznjaY2BkYGAA4in8zwXi+W2+MjCzMIDApSwvXzC97Z4Ig8N/BxYGZgcgl52BCSQKAA3jCV8CAABfAAAAAAQAAEB42mNgZGBg4f3vACQZQABIMjKgAmYAKEgBXgAAeNpjYGY6wTiBgZWBg2kmUxoDA4MPhGZMYzBi1AHygVLYQUCaawqDA4PChxhmh/8ODDEsvAwHgMKMIDnGL0x7gJQCAwMAJd4MFwAAAHjaY2BgYGaA4DAGRgYQkAHyGMF8NgYrIM3JIAGVYYDT+AEjAwuDFpBmA9KMDEwMCh9i/v8H8sH0/4dQc1iAmAkALaUKLgAAAHjaTY9LDsIgEIbtgqHUPpDi3gPoBVyRTmTddOmqTXThEXqrob2gQ1FjwpDvfwCBdmdXC5AVKFu3e5MfNFJ29KTQT48Ob9/lqYwOGZxeUelN2U2R6+cArgtCJpauW7UQBqnFkUsjAY/kOU1cP+DAgvxwn1chZDwUbd6CFimGXwzwF6tPbFIcjEl+vvmM/byA48e6tWrKArm4ZJlCbdsrxksL1AwWn/yBSJKpYbq8AXaaTb8AAHja28jAwOC00ZrBeQNDQOWO//sdBBgYGRiYWYAEELEwMTE4uzo5Zzo5b2BxdnFOcALxNjA6b2ByTswC8jYwg0VlNuoCTWAMqNzMzsoK1rEhNqByEyerg5PMJlYuVueETKcd/89uBpnpvIEVomeHLoMsAAe1Id4AAAAAAAB42oWQT07CQBTGv0JBhagk7HQzKxca2sJCE1hDt4QF+9JOS0nbaaYDCQfwCJ7Au3AHj+LO13FMmm6cl7785vven0kBjHCBhfpYuNa5Ph1c0e2Xu3jEvWG7UdPDLZ4N92nOm+EBXuAbHmIMSRMs+4aUEd4Nd3CHD8NdvOLTsA2GL8M9PODbcL+hD7C1xoaHeLJSEao0FEW14ckxC+TU8TxvsY6X0eLPmRhry2WVioLpkrbp84LLQPGI7c6sOiUzpWIWS5GzlSgUzzLBSikOPFTOXqly7rqx0Z1Q5BAIoZBSFihQYQOOBEdkCOgXTOHA07HAGjGWiIjaPZNW13/+lm6S9FT7rLHFJ6fQbkATOG1j2OFMucKJJsxIVfQORl+9Jyda6Sl1dUYhSCm1dyClfoeDve4qMYdLEbfqHf3O/AdDumsjAAB42mNgYoAAZQYjBmyAGYQZmdhL8zLdDEydARfoAqIAAAABAAMABwAKABMAB///AA8AAQAAAAAAAAAAAAAAAAABAAAAAA==) format("woff")}article#presentation > svg > foreignObject > section .markdown-body,article#presentation > svg > foreignObject > section{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%;color:#24292e;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;font-size:16px;line-height:1.5;word-wrap:break-word}article#presentation > svg > foreignObject > section .markdown-body .pl-c,article#presentation > svg > foreignObject > section .pl-c{color:#6a737d}article#presentation > svg > foreignObject > section .markdown-body .pl-c1,article#presentation > svg > foreignObject > section .markdown-body .pl-s .pl-v,article#presentation > svg > foreignObject > section .pl-c1,article#presentation > svg > foreignObject > section .pl-s .pl-v{color:#005cc5}article#presentation > svg > foreignObject > section .markdown-body .pl-e,article#presentation > svg > foreignObject > section .markdown-body .pl-en,article#presentation > svg > foreignObject > section .pl-e,article#presentation > svg > foreignObject > section .pl-en{color:#6f42c1}article#presentation > svg > foreignObject > section .markdown-body .pl-s .pl-s1,article#presentation > svg > foreignObject > section .markdown-body .pl-smi,article#presentation > svg > foreignObject > section .pl-s .pl-s1,article#presentation > svg > foreignObject > section .pl-smi{color:#24292e}article#presentation > svg > foreignObject > section .markdown-body .pl-ent,article#presentation > svg > foreignObject > section .pl-ent{color:#22863a}article#presentation > svg > foreignObject > section .markdown-body .pl-k,article#presentation > svg > foreignObject > section .pl-k{color:#d73a49}article#presentation > svg > foreignObject > section .markdown-body .pl-pds,article#presentation > svg > foreignObject > section .markdown-body .pl-s,article#presentation > svg > foreignObject > section .markdown-body .pl-s .pl-pse .pl-s1,article#presentation > svg > foreignObject > section .markdown-body .pl-sr,article#presentation > svg > foreignObject > section .markdown-body .pl-sr .pl-cce,article#presentation > svg > foreignObject > section .markdown-body .pl-sr .pl-sra,article#presentation > svg > foreignObject > section .markdown-body .pl-sr .pl-sre,article#presentation > svg > foreignObject > section .pl-pds,article#presentation > svg > foreignObject > section .pl-s,article#presentation > svg > foreignObject > section .pl-s .pl-pse .pl-s1,article#presentation > svg > foreignObject > section .pl-sr,article#presentation > svg > foreignObject > section .pl-sr .pl-cce,article#presentation > svg > foreignObject > section .pl-sr .pl-sra,article#presentation > svg > foreignObject > section .pl-sr .pl-sre{color:#032f62}article#presentation > svg > foreignObject > section .markdown-body .pl-smw,article#presentation > svg > foreignObject > section .markdown-body .pl-v,article#presentation > svg > foreignObject > section .pl-smw,article#presentation > svg > foreignObject > section .pl-v{color:#e36209}article#presentation > svg > foreignObject > section .markdown-body .pl-bu,article#presentation > svg > foreignObject > section .pl-bu{color:#b31d28}article#presentation > svg > foreignObject > section .markdown-body .pl-ii,article#presentation > svg > foreignObject > section .pl-ii{color:#fafbfc;background-color:#b31d28}article#presentation > svg > foreignObject > section .markdown-body .pl-c2,article#presentation > svg > foreignObject > section .pl-c2{color:#fafbfc;background-color:#d73a49}article#presentation > svg > foreignObject > section .markdown-body .pl-c2:before,article#presentation > svg > foreignObject > section .pl-c2:before{content:"^M"}article#presentation > svg > foreignObject > section .markdown-body .pl-sr .pl-cce,article#presentation > svg > foreignObject > section .pl-sr .pl-cce{font-weight:700;color:#22863a}article#presentation > svg > foreignObject > section .markdown-body .pl-ml,article#presentation > svg > foreignObject > section .pl-ml{color:#735c0f}article#presentation > svg > foreignObject > section .markdown-body .pl-mh,article#presentation > svg > foreignObject > section .markdown-body .pl-mh .pl-en,article#presentation > svg > foreignObject > section .markdown-body .pl-ms,article#presentation > svg > foreignObject > section .pl-mh,article#presentation > svg > foreignObject > section .pl-mh .pl-en,article#presentation > svg > foreignObject > section .pl-ms{font-weight:700;color:#005cc5}article#presentation > svg > foreignObject > section .markdown-body .pl-mi,article#presentation > svg > foreignObject > section .pl-mi{font-style:italic;color:#24292e}article#presentation > svg > foreignObject > section .markdown-body .pl-mb,article#presentation > svg > foreignObject > section .pl-mb{font-weight:700;color:#24292e}article#presentation > svg > foreignObject > section .markdown-body .pl-md,article#presentation > svg > foreignObject > section .pl-md{color:#b31d28;background-color:#ffeef0}article#presentation > svg > foreignObject > section .markdown-body .pl-mi1,article#presentation > svg > foreignObject > section .pl-mi1{color:#22863a;background-color:#f0fff4}article#presentation > svg > foreignObject > section .markdown-body .pl-mc,article#presentation > svg > foreignObject > section .pl-mc{color:#e36209;background-color:#ffebda}article#presentation > svg > foreignObject > section .markdown-body .pl-mi2,article#presentation > svg > foreignObject > section .pl-mi2{color:#f6f8fa;background-color:#005cc5}article#presentation > svg > foreignObject > section .markdown-body .pl-mdr,article#presentation > svg > foreignObject > section .pl-mdr{font-weight:700;color:#6f42c1}article#presentation > svg > foreignObject > section .markdown-body .pl-ba,article#presentation > svg > foreignObject > section .pl-ba{color:#586069}article#presentation > svg > foreignObject > section .markdown-body .pl-sg,article#presentation > svg > foreignObject > section .pl-sg{color:#959da5}article#presentation > svg > foreignObject > section .markdown-body .pl-corl,article#presentation > svg > foreignObject > section .pl-corl{text-decoration:underline;color:#032f62}article#presentation > svg > foreignObject > section .markdown-body .octicon,article#presentation > svg > foreignObject > section .octicon{display:inline-block;vertical-align:text-top;fill:currentColor}article#presentation > svg > foreignObject > section .markdown-body a,article#presentation > svg > foreignObject > section a{background-color:transparent}article#presentation > svg > foreignObject > section .markdown-body a:active,article#presentation > svg > foreignObject > section .markdown-body a:hover,article#presentation > svg > foreignObject > section a:active,article#presentation > svg > foreignObject > section a:hover{outline-width:0}article#presentation > svg > foreignObject > section .markdown-body strong,article#presentation > svg > foreignObject > section strong{font-weight:inherit;font-weight:bolder}article#presentation > svg > foreignObject > section .markdown-body h1,article#presentation > svg > foreignObject > section h1{margin:.67em 0}article#presentation > svg > foreignObject > section .markdown-body img,article#presentation > svg > foreignObject > section img{border-style:none}article#presentation > svg > foreignObject > section .markdown-body code,article#presentation > svg > foreignObject > section .markdown-body kbd,article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section code,article#presentation > svg > foreignObject > section kbd,article#presentation > svg > foreignObject > section pre{font-family:monospace,monospace;font-size:1em}article#presentation > svg > foreignObject > section .markdown-body hr,article#presentation > svg > foreignObject > section hr{box-sizing:content-box;overflow:visible}article#presentation > svg > foreignObject > section .markdown-body input,article#presentation > svg > foreignObject > section input{font:inherit;margin:0;overflow:visible}article#presentation > svg > foreignObject > section .markdown-body [type=checkbox],article#presentation > svg > foreignObject > section [type=checkbox]{box-sizing:border-box;padding:0}article#presentation > svg > foreignObject > section .markdown-body *,article#presentation > svg > foreignObject > section *{box-sizing:border-box}article#presentation > svg > foreignObject > section .markdown-body input,article#presentation > svg > foreignObject > section input{font-family:inherit;font-size:inherit;line-height:inherit}article#presentation > svg > foreignObject > section .markdown-body a,article#presentation > svg > foreignObject > section a{color:#0366d6;text-decoration:none}article#presentation > svg > foreignObject > section .markdown-body a:hover,article#presentation > svg > foreignObject > section a:hover{text-decoration:underline}article#presentation > svg > foreignObject > section .markdown-body strong,article#presentation > svg > foreignObject > section strong{font-weight:600}article#presentation > svg > foreignObject > section .markdown-body hr,article#presentation > svg > foreignObject > section hr{height:0;margin:15px 0;overflow:hidden;background:transparent;border-bottom:1px solid #dfe2e5}article#presentation > svg > foreignObject > section .markdown-body hr:before,article#presentation > svg > foreignObject > section hr:before{display:table;content:""}article#presentation > svg > foreignObject > section .markdown-body hr:after,article#presentation > svg > foreignObject > section hr:after{display:table;clear:both;content:""}article#presentation > svg > foreignObject > section .markdown-body table,article#presentation > svg > foreignObject > section table{border-spacing:0;border-collapse:collapse}article#presentation > svg > foreignObject > section .markdown-body td,article#presentation > svg > foreignObject > section .markdown-body th,article#presentation > svg > foreignObject > section td,article#presentation > svg > foreignObject > section th{padding:0}article#presentation > svg > foreignObject > section .markdown-body h1,article#presentation > svg > foreignObject > section .markdown-body h2,article#presentation > svg > foreignObject > section .markdown-body h3,article#presentation > svg > foreignObject > section .markdown-body h4,article#presentation > svg > foreignObject > section .markdown-body h5,article#presentation > svg > foreignObject > section .markdown-body h6,article#presentation > svg > foreignObject > section h1,article#presentation > svg > foreignObject > section h2,article#presentation > svg > foreignObject > section h3,article#presentation > svg > foreignObject > section h4,article#presentation > svg > foreignObject > section h5,article#presentation > svg > foreignObject > section h6{margin-top:0;margin-bottom:0}article#presentation > svg > foreignObject > section .markdown-body h1,article#presentation > svg > foreignObject > section h1{font-size:32px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body h2,article#presentation > svg > foreignObject > section h2{font-size:24px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body h3,article#presentation > svg > foreignObject > section h3{font-size:20px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body h4,article#presentation > svg > foreignObject > section h4{font-size:16px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body h5,article#presentation > svg > foreignObject > section h5{font-size:14px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body h6,article#presentation > svg > foreignObject > section h6{font-size:12px;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body p,article#presentation > svg > foreignObject > section p{margin-top:0;margin-bottom:10px}article#presentation > svg > foreignObject > section .markdown-body blockquote,article#presentation > svg > foreignObject > section blockquote{margin:0}article#presentation > svg > foreignObject > section .markdown-body ol,article#presentation > svg > foreignObject > section .markdown-body ul,article#presentation > svg > foreignObject > section ol,article#presentation > svg > foreignObject > section ul{padding-left:0;margin-top:0;margin-bottom:0}article#presentation > svg > foreignObject > section .markdown-body ol ol,article#presentation > svg > foreignObject > section .markdown-body ul ol,article#presentation > svg > foreignObject > section ol ol,article#presentation > svg > foreignObject > section ul ol{list-style-type:lower-roman}article#presentation > svg > foreignObject > section .markdown-body ol ol ol,article#presentation > svg > foreignObject > section .markdown-body ol ul ol,article#presentation > svg > foreignObject > section .markdown-body ul ol ol,article#presentation > svg > foreignObject > section .markdown-body ul ul ol,article#presentation > svg > foreignObject > section ol ol ol,article#presentation > svg > foreignObject > section ol ul ol,article#presentation > svg > foreignObject > section ul ol ol,article#presentation > svg > foreignObject > section ul ul ol{list-style-type:lower-alpha}article#presentation > svg > foreignObject > section .markdown-body dd,article#presentation > svg > foreignObject > section dd{margin-left:0}article#presentation > svg > foreignObject > section .markdown-body code,article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section code,article#presentation > svg > foreignObject > section pre{font-family:SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;font-size:12px}article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section pre{margin-top:0;margin-bottom:0}article#presentation > svg > foreignObject > section .markdown-body .octicon,article#presentation > svg > foreignObject > section .octicon{vertical-align:text-bottom}article#presentation > svg > foreignObject > section .markdown-body .pl-0,article#presentation > svg > foreignObject > section .pl-0{padding-left:0!important}article#presentation > svg > foreignObject > section .markdown-body .pl-1,article#presentation > svg > foreignObject > section .pl-1{padding-left:4px!important}article#presentation > svg > foreignObject > section .markdown-body .pl-2,article#presentation > svg > foreignObject > section .pl-2{padding-left:8px!important}article#presentation > svg > foreignObject > section .markdown-body .pl-3,article#presentation > svg > foreignObject > section .pl-3{padding-left:16px!important}article#presentation > svg > foreignObject > section .markdown-body .pl-4,article#presentation > svg > foreignObject > section .pl-4{padding-left:24px!important}article#presentation > svg > foreignObject > section .markdown-body .pl-5,article#presentation > svg > foreignObject > section .pl-5{padding-left:32px!important}article#presentation > svg > foreignObject > section .markdown-body .pl-6,article#presentation > svg > foreignObject > section .pl-6{padding-left:40px!important}article#presentation > svg > foreignObject > section .markdown-body:before,article#presentation > svg > foreignObject > section:before{display:table;content:""}article#presentation > svg > foreignObject > section .markdown-body:after,article#presentation > svg > foreignObject > section:after{display:table;clear:both/* content:""; */}article#presentation > svg > foreignObject > section .markdown-body>:first-child,article#presentation > svg > foreignObject > section>:first-child{margin-top:0!important}article#presentation > svg > foreignObject > section .markdown-body>:last-child,article#presentation > svg > foreignObject > section>:last-child{margin-bottom:0!important}article#presentation > svg > foreignObject > section .markdown-body a:not([href]),article#presentation > svg > foreignObject > section a:not([href]){color:inherit;text-decoration:none}article#presentation > svg > foreignObject > section .markdown-body .anchor,article#presentation > svg > foreignObject > section .anchor{float:left;padding-right:4px;margin-left:-20px;line-height:1}article#presentation > svg > foreignObject > section .markdown-body .anchor:focus,article#presentation > svg > foreignObject > section .anchor:focus{outline:none}article#presentation > svg > foreignObject > section .markdown-body blockquote,article#presentation > svg > foreignObject > section .markdown-body dl,article#presentation > svg > foreignObject > section .markdown-body ol,article#presentation > svg > foreignObject > section .markdown-body p,article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section .markdown-body table,article#presentation > svg > foreignObject > section .markdown-body ul,article#presentation > svg > foreignObject > section blockquote,article#presentation > svg > foreignObject > section dl,article#presentation > svg > foreignObject > section ol,article#presentation > svg > foreignObject > section p,article#presentation > svg > foreignObject > section pre,article#presentation > svg > foreignObject > section table,article#presentation > svg > foreignObject > section ul{margin-top:0;margin-bottom:16px}article#presentation > svg > foreignObject > section .markdown-body hr,article#presentation > svg > foreignObject > section hr{height:.25em;padding:0;margin:24px 0;background-color:#e1e4e8;border:0}article#presentation > svg > foreignObject > section .markdown-body blockquote,article#presentation > svg > foreignObject > section blockquote{padding:0 1em;color:#6a737d;border-left:.25em solid #dfe2e5}article#presentation > svg > foreignObject > section .markdown-body blockquote>:first-child,article#presentation > svg > foreignObject > section blockquote>:first-child{margin-top:0}article#presentation > svg > foreignObject > section .markdown-body blockquote>:last-child,article#presentation > svg > foreignObject > section blockquote>:last-child{margin-bottom:0}article#presentation > svg > foreignObject > section .markdown-body kbd,article#presentation > svg > foreignObject > section kbd{font-size:11px;border:1px solid #c6cbd1;border-bottom-color:#959da5;box-shadow:inset 0 -1px 0 #959da5}article#presentation > svg > foreignObject > section .markdown-body h1,article#presentation > svg > foreignObject > section .markdown-body h2,article#presentation > svg > foreignObject > section .markdown-body h3,article#presentation > svg > foreignObject > section .markdown-body h4,article#presentation > svg > foreignObject > section .markdown-body h5,article#presentation > svg > foreignObject > section .markdown-body h6,article#presentation > svg > foreignObject > section h1,article#presentation > svg > foreignObject > section h2,article#presentation > svg > foreignObject > section h3,article#presentation > svg > foreignObject > section h4,article#presentation > svg > foreignObject > section h5,article#presentation > svg > foreignObject > section h6{margin-top:24px;margin-bottom:16px;font-weight:600;line-height:1.25}article#presentation > svg > foreignObject > section .markdown-body h1 .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h2 .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h3 .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h4 .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h5 .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h6 .octicon-link,article#presentation > svg > foreignObject > section h1 .octicon-link,article#presentation > svg > foreignObject > section h2 .octicon-link,article#presentation > svg > foreignObject > section h3 .octicon-link,article#presentation > svg > foreignObject > section h4 .octicon-link,article#presentation > svg > foreignObject > section h5 .octicon-link,article#presentation > svg > foreignObject > section h6 .octicon-link{color:#1b1f23;vertical-align:middle;visibility:hidden}article#presentation > svg > foreignObject > section .markdown-body h1:hover .anchor,article#presentation > svg > foreignObject > section .markdown-body h2:hover .anchor,article#presentation > svg > foreignObject > section .markdown-body h3:hover .anchor,article#presentation > svg > foreignObject > section .markdown-body h4:hover .anchor,article#presentation > svg > foreignObject > section .markdown-body h5:hover .anchor,article#presentation > svg > foreignObject > section .markdown-body h6:hover .anchor,article#presentation > svg > foreignObject > section h1:hover .anchor,article#presentation > svg > foreignObject > section h2:hover .anchor,article#presentation > svg > foreignObject > section h3:hover .anchor,article#presentation > svg > foreignObject > section h4:hover .anchor,article#presentation > svg > foreignObject > section h5:hover .anchor,article#presentation > svg > foreignObject > section h6:hover .anchor{text-decoration:none}article#presentation > svg > foreignObject > section .markdown-body h1:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h2:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h3:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h4:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h5:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section .markdown-body h6:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h1:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h2:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h3:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h4:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h5:hover .anchor .octicon-link,article#presentation > svg > foreignObject > section h6:hover .anchor .octicon-link{visibility:visible}article#presentation > svg > foreignObject > section .markdown-body h1,article#presentation > svg > foreignObject > section h1{padding-bottom:.3em;font-size:2em;border-bottom:1px solid #eaecef}article#presentation > svg > foreignObject > section .markdown-body h2,article#presentation > svg > foreignObject > section h2{padding-bottom:.3em;font-size:1.5em;border-bottom:1px solid #eaecef}article#presentation > svg > foreignObject > section .markdown-body h3,article#presentation > svg > foreignObject > section h3{font-size:1.25em}article#presentation > svg > foreignObject > section .markdown-body h4,article#presentation > svg > foreignObject > section h4{font-size:1em}article#presentation > svg > foreignObject > section .markdown-body h5,article#presentation > svg > foreignObject > section h5{font-size:.875em}article#presentation > svg > foreignObject > section .markdown-body h6,article#presentation > svg > foreignObject > section h6{font-size:.85em;color:#6a737d}article#presentation > svg > foreignObject > section .markdown-body ol,article#presentation > svg > foreignObject > section .markdown-body ul,article#presentation > svg > foreignObject > section ol,article#presentation > svg > foreignObject > section ul{padding-left:2em}article#presentation > svg > foreignObject > section .markdown-body ol ol,article#presentation > svg > foreignObject > section .markdown-body ol ul,article#presentation > svg > foreignObject > section .markdown-body ul ol,article#presentation > svg > foreignObject > section .markdown-body ul ul,article#presentation > svg > foreignObject > section ol ol,article#presentation > svg > foreignObject > section ol ul,article#presentation > svg > foreignObject > section ul ol,article#presentation > svg > foreignObject > section ul ul{margin-top:0;margin-bottom:0}article#presentation > svg > foreignObject > section .markdown-body li,article#presentation > svg > foreignObject > section li{word-wrap:break-all}article#presentation > svg > foreignObject > section .markdown-body li>p,article#presentation > svg > foreignObject > section li>p{margin-top:16px}article#presentation > svg > foreignObject > section .markdown-body li+li,article#presentation > svg > foreignObject > section li+li{margin-top:.25em}article#presentation > svg > foreignObject > section .markdown-body dl,article#presentation > svg > foreignObject > section dl{padding:0}article#presentation > svg > foreignObject > section .markdown-body dl dt,article#presentation > svg > foreignObject > section dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:600}article#presentation > svg > foreignObject > section .markdown-body dl dd,article#presentation > svg > foreignObject > section dl dd{padding:0 16px;margin-bottom:16px}article#presentation > svg > foreignObject > section .markdown-body table,article#presentation > svg > foreignObject > section table{display:block;width:100%;overflow:auto}article#presentation > svg > foreignObject > section .markdown-body table th,article#presentation > svg > foreignObject > section table th{font-weight:600}article#presentation > svg > foreignObject > section .markdown-body table td,article#presentation > svg > foreignObject > section .markdown-body table th,article#presentation > svg > foreignObject > section table td,article#presentation > svg > foreignObject > section table th{padding:6px 13px;border:1px solid #dfe2e5}article#presentation > svg > foreignObject > section .markdown-body table tr,article#presentation > svg > foreignObject > section table tr{background-color:#fff;border-top:1px solid #c6cbd1}article#presentation > svg > foreignObject > section .markdown-body table tr:nth-child(2n),article#presentation > svg > foreignObject > section table tr:nth-child(2n){background-color:#f6f8fa}article#presentation > svg > foreignObject > section .markdown-body img,article#presentation > svg > foreignObject > section img{max-width:100%;box-sizing:content-box;background-color:#fff}article#presentation > svg > foreignObject > section .markdown-body img[align=right],article#presentation > svg > foreignObject > section img[align=right]{padding-left:20px}article#presentation > svg > foreignObject > section .markdown-body img[align=left],article#presentation > svg > foreignObject > section img[align=left]{padding-right:20px}article#presentation > svg > foreignObject > section .markdown-body code,article#presentation > svg > foreignObject > section code{padding:.2em .4em;margin:0;font-size:85%;background-color:rgba(27,31,35,.05);border-radius:3px}article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section pre{word-wrap:normal}article#presentation > svg > foreignObject > section .markdown-body pre>code,article#presentation > svg > foreignObject > section pre>code{padding:0;margin:0;font-size:100%;word-break:normal;white-space:pre;background:transparent;border:0}article#presentation > svg > foreignObject > section .markdown-body .highlight,article#presentation > svg > foreignObject > section .highlight{margin-bottom:16px}article#presentation > svg > foreignObject > section .markdown-body .highlight pre,article#presentation > svg > foreignObject > section .highlight pre{margin-bottom:0;word-break:normal}article#presentation > svg > foreignObject > section .markdown-body .highlight pre,article#presentation > svg > foreignObject > section .markdown-body pre,article#presentation > svg > foreignObject > section .highlight pre,article#presentation > svg > foreignObject > section pre{padding:16px;overflow:auto;font-size:85%;line-height:1.45;background-color:#f6f8fa;border-radius:3px}article#presentation > svg > foreignObject > section .markdown-body pre code,article#presentation > svg > foreignObject > section pre code{display:inline;max-width:auto;padding:0;margin:0;overflow:visible;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}article#presentation > svg > foreignObject > section .markdown-body .full-commit .btn-outline:not(:disabled):hover,article#presentation > svg > foreignObject > section .full-commit .btn-outline:not(:disabled):hover{color:#005cc5;border-color:#005cc5}article#presentation > svg > foreignObject > section .markdown-body kbd,article#presentation > svg > foreignObject > section kbd{display:inline-block;padding:3px 5px;font:11px SFMono-Regular,Consolas,Liberation Mono,Menlo,Courier,monospace;line-height:10px;color:#444d56;vertical-align:middle;background-color:#fafbfc;border:1px solid #d1d5da;border-bottom-color:#c6cbd1;border-radius:3px;box-shadow:inset 0 -1px 0 #c6cbd1}article#presentation > svg > foreignObject > section .markdown-body :checked+.radio-label,article#presentation > svg > foreignObject > section :checked+.radio-label{position:relative;z-index:1;border-color:#0366d6}article#presentation > svg > foreignObject > section .markdown-body .task-list-item,article#presentation > svg > foreignObject > section .task-list-item{list-style-type:none}article#presentation > svg > foreignObject > section .markdown-body .task-list-item+.task-list-item,article#presentation > svg > foreignObject > section .task-list-item+.task-list-item{margin-top:3px}article#presentation > svg > foreignObject > section .markdown-body .task-list-item input,article#presentation > svg > foreignObject > section .task-list-item input{margin:0 .2em .25em -1.6em;vertical-align:middle}article#presentation > svg > foreignObject > section .markdown-body hr,article#presentation > svg > foreignObject > section hr{border-bottom-color:#eee}article#presentation > svg > foreignObject > section .hljs{display:block;background:#fff;padding:.5em;color:#333;overflow-x:auto}article#presentation > svg > foreignObject > section .hljs-comment,article#presentation > svg > foreignObject > section .hljs-meta{color:#969896}article#presentation > svg > foreignObject > section .hljs-emphasis,article#presentation > svg > foreignObject > section .hljs-quote,article#presentation > svg > foreignObject > section .hljs-string,article#presentation > svg > foreignObject > section .hljs-strong,article#presentation > svg > foreignObject > section .hljs-template-variable,article#presentation > svg > foreignObject > section .hljs-variable{color:#df5000}article#presentation > svg > foreignObject > section .hljs-keyword,article#presentation > svg > foreignObject > section .hljs-selector-tag,article#presentation > svg > foreignObject > section .hljs-type{color:#a71d5d}article#presentation > svg > foreignObject > section .hljs-attribute,article#presentation > svg > foreignObject > section .hljs-bullet,article#presentation > svg > foreignObject > section .hljs-literal,article#presentation > svg > foreignObject > section .hljs-symbol{color:#0086b3}article#presentation > svg > foreignObject > section .hljs-name,article#presentation > svg > foreignObject > section .hljs-section{color:#63a35c}article#presentation > svg > foreignObject > section .hljs-tag{color:#333}article#presentation > svg > foreignObject > section .hljs-attr,article#presentation > svg > foreignObject > section .hljs-selector-attr,article#presentation > svg > foreignObject > section .hljs-selector-class,article#presentation > svg > foreignObject > section .hljs-selector-id,article#presentation > svg > foreignObject > section .hljs-selector-pseudo,article#presentation > svg > foreignObject > section .hljs-title{color:#795da3}article#presentation > svg > foreignObject > section .hljs-addition{color:#55a532;background-color:#eaffea}article#presentation > svg > foreignObject > section .hljs-deletion{color:#bd2c00;background-color:#ffecec}article#presentation > svg > foreignObject > section .hljs-link{text-decoration:underline}article#presentation > svg > foreignObject > section svg[data-marp-fitting=svg]{max-height:563px}article#presentation > svg > foreignObject > section h1{color:#246;font-size:1.6em}article#presentation > svg > foreignObject > section h1,article#presentation > svg > foreignObject > section h2{border-bottom:none}article#presentation > svg > foreignObject > section h2{font-size:1.3em}article#presentation > svg > foreignObject > section h3{font-size:1.1em}article#presentation > svg > foreignObject > section h4{font-size:1.05em}article#presentation > svg > foreignObject > section h5{font-size:1em}article#presentation > svg > foreignObject > section h6{font-size:.9em}article#presentation > svg > foreignObject > section h1 strong,article#presentation > svg > foreignObject > section h2 strong,article#presentation > svg > foreignObject > section h3 strong,article#presentation > svg > foreignObject > section h4 strong,article#presentation > svg > foreignObject > section h5 strong,article#presentation > svg > foreignObject > section h6 strong{font-weight:inherit;color:#48c}article#presentation > svg > foreignObject > section hr{height:0;padding-top:.25em}article#presentation > svg > foreignObject > section pre{border:1px solid #999;line-height:1.15;overflow:visible}article#presentation > svg > foreignObject > section pre code svg[data-marp-fitting=svg]{max-height:529px}article#presentation > svg > foreignObject > section footer,article#presentation > svg > foreignObject > section header{margin:0;position:absolute;left:30px;color:hsla(0,0%,40%,.75);font-size:18px}article#presentation > svg > foreignObject > section header{top:21px}article#presentation > svg > foreignObject > section footer{bottom:21px}article#presentation > svg > foreignObject > section{align-items:stretch;background:#fff;display:flex;flex-direction:column;flex-wrap:nowrap;font-size:29px;height:720px;justify-content:center;padding:78.5px;width:1280px}article#presentation > svg > foreignObject > section>:last-child,article#presentation > svg > foreignObject > section[data-footer]>:nth-last-child(2){margin-bottom:0}article#presentation > svg > foreignObject > section>:first-child,article#presentation > svg > foreignObject > section>header:first-child+*{margin-top:0}article#presentation > svg > foreignObject > section:after{position:absolute;padding:0;right:30px;bottom:21px;font-size:24px;color:#777}article#presentation > svg > foreignObject > section.invert{background-color:#222;color:#e6eaf0}article#presentation > svg > foreignObject > section.invert:after{color:#999}article#presentation > svg > foreignObject > section.invert img{background-color:transparent}article#presentation > svg > foreignObject > section.invert a{color:#50b3ff}article#presentation > svg > foreignObject > section.invert h1{color:#a3c5e7}article#presentation > svg > foreignObject > section.invert h2,article#presentation > svg > foreignObject > section.invert h3,article#presentation > svg > foreignObject > section.invert h4,article#presentation > svg > foreignObject > section.invert h5{color:#ebeff5}article#presentation > svg > foreignObject > section.invert blockquote,article#presentation > svg > foreignObject > section.invert h6{border-color:#3d3f43;color:#939699}article#presentation > svg > foreignObject > section.invert h1 strong,article#presentation > svg > foreignObject > section.invert h2 strong,article#presentation > svg > foreignObject > section.invert h3 strong,article#presentation > svg > foreignObject > section.invert h4 strong,article#presentation > svg > foreignObject > section.invert h5 strong,article#presentation > svg > foreignObject > section.invert h6 strong{color:#7bf}article#presentation > svg > foreignObject > section.invert hr{background-color:#3d3f43}article#presentation > svg > foreignObject > section.invert footer,article#presentation > svg > foreignObject > section.invert header{color:hsla(0,0%,60%,.75)}article#presentation > svg > foreignObject > section.invert code,article#presentation > svg > foreignObject > section.invert kbd{background-color:#111}article#presentation > svg > foreignObject > section.invert kbd{border-color:#666;box-shadow:inset 0 -1px 0 #555;color:#e6eaf0}article#presentation > svg > foreignObject > section.invert table tr{background-color:#12181d;border-color:#60657b}article#presentation > svg > foreignObject > section.invert table tr:nth-child(2n){background-color:#1b2024}article#presentation > svg > foreignObject > section.invert table td,article#presentation > svg > foreignObject > section.invert table th{border-color:#5b5e61}article#presentation > svg > foreignObject > section.invert pre{background-color:#0a0e12;border-color:#777}article#presentation > svg > foreignObject > section.invert pre code{background-color:transparent}article#presentation > svg > foreignObject > section[data-color] h1,article#presentation > svg > foreignObject > section[data-color] h2,article#presentation > svg > foreignObject > section[data-color] h3,article#presentation > svg > foreignObject > section[data-color] h4,article#presentation > svg > foreignObject > section[data-color] h5,article#presentation > svg > foreignObject > section[data-color] h6{color:currentColor}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"] {
+  padding: 0 !important;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"]::before,
+article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"]::after,
+article#presentation > svg > foreignObject > section[data-marpit-advanced-background="content"]::before,
+article#presentation > svg > foreignObject > section[data-marpit-advanced-background="content"]::after {
+  display: none !important;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"] > div[data-marpit-advanced-background-container] {
+  all: initial;
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"][data-marpit-advanced-background-split] > div[data-marpit-advanced-background-container] {
+  width: 50%;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"][data-marpit-advanced-background-split="right"] > div[data-marpit-advanced-background-container] {
+  margin-left: 50%;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="background"] > div[data-marpit-advanced-background-container] > figure {
+  all: initial;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  flex: auto;
+  margin: 0;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="content"],
+article#presentation > svg > foreignObject > section[data-marpit-advanced-background="pseudo"] {
+  background: transparent !important;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background="pseudo"],
+article#presentation > svg[data-marpit-svg] > foreignObject[data-marpit-advanced-background="pseudo"] {
+  pointer-events: none !important;
+}article#presentation > svg > foreignObject > section[data-marpit-advanced-background-split] {
+  width: 100%;
+  height: 100%;
+}</style></head><body><article id="presentation"><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="1">
+<h3>Quick Start of SBT</h3>
+<blockquote>
+<p>The  interactive <strong>build tool<br />
+Define</strong> your tasks in Scala<br />
+Run them in <strong>parallel</strong> from sbt's interactive shell</p>
+</blockquote>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-2">
-    <section class="slide-content"><h3 id="interactive-sample">Interactive Sample</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="2">
+<h3>Batch Mode</h3>
+<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-variable">$ </span>sbt clean compile <span class="hljs-string">"testOnly TestA TestB"</span>
+</span></span></foreignObject></svg></code></pre>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png" alt="batch_mode" /></p>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="3">
+<h3>Interactive Sample</h3>
 <ul>
-<li><p>projects / project</p>
+<li>
+<p>projects / project</p>
 </li>
-<li><p>reload</p>
+<li>
+<p>reload</p>
 </li>
-<li><p>inspect / inspect tree</p>
+<li>
+<p>inspect / inspect tree</p>
 </li>
-<li><p>&lt; task &gt; / show &lt; task &gt;</p>
+<li>
+<p>&lt; task &gt; / show &lt; task &gt;</p>
 </li>
-<li><p>testOnly / testQuick</p>
+<li>
+<p>testOnly / testQuick</p>
 </li>
 </ul>
 <p><a href="https://www.scala-sbt.org/1.x/docs/Command-Line-Reference.html">Command line Reference</a></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-3">
-    <section class="slide-content"><h3 id="batch-mode">Batch Mode</h3>
-<pre><code>$ sbt clean compile &quot;testOnly TestA TestB&quot;
-</code></pre><p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/batchMode.png" alt="batch_mode"></p>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="4">
+<h3>Task Engine - Task</h3>
+<h5>The common commands you can run are almost all tasks!</h5>
+<p>compile  , test ,  sources</p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_source.png" alt="inspect_source" /></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-4">
-    <section class="slide-content"><h3 id="task-engine-task">Task Engine - Task</h3>
-<h5 id="the-common-commands-you-can-run-are-almost-all-tasks-">The common commands you can run are almost all tasks!</h5>
-<p>compile  , test ,  sources ……   </p>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_source.png" alt="inspect_source"></p>
-</section>
-  </div>
-  <div class="slide hidden" id="slide-5">
-    <section class="slide-content"><h3 id="task-engine-setting">Task Engine -Setting</h3>
-<h5 id="the-common-commands-you-can-run-are-almost-all-tasks-">The common commands you can run are almost all tasks!</h5>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="5">
+<h3>Task Engine -Setting</h3>
+<h5>The common commands you can run are almost all tasks!</h5>
 <p>name, scalaSource, javaSource ....</p>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_name.png" alt="inspect_name"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_name.png" alt="inspect_name" /></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-6">
-    <section class="slide-content"><h3 id="taskengine-setting-vs-task">TaskEngine - Setting VS Task</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="6">
+<h3>TaskEngine - Setting VS Task</h3>
 <ul>
 <li>Settings are evaluated at project load time</li>
 <li>Tasks are executed on demand, often in response to a command from the user</li>
 <li>Settings can only depend on Settings</li>
 <li>Tasks can depend on Settings and Tasks</li>
 </ul>
-<h5 id="depend">Depend</h5>
+<h5>Depend</h5>
 <p><strong>.value</strong></p>
-<pre><code class="lang-scala"> scalaSource in <span class="hljs-type">Compile</span> := baseDirectory.value / <span class="hljs-string">"src"</span>,
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap> scalaSource in <span class="hljs-type">Compile</span> := baseDirectory.value / <span class="hljs-string">"src"</span>,
  javaSource in <span class="hljs-type">Compile</span> := (scalaSource in <span class="hljs-type">Compile</span>).value,
-</code></pre>
-<p> <a href="https://www.scala-sbt.org/1.x/docs/Tasks.html">Tasks</a></p>
+</span></span></foreignObject></svg></code></pre>
+<p><a href="https://www.scala-sbt.org/1.x/docs/Tasks.html">Tasks</a></p>
 <p><a href="https://www.scala-sbt.org/1.x/docs/Task-Inputs.html">Tasks/Settins</a></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-7">
-    <section class="slide-content"><h3 id="taskengine-dag">TaskEngine - DAG</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="7">
+<h3>TaskEngine - DAG</h3>
 <p>Inspect tree sources</p>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_tree_source.jpg" alt="inspect_tree_source"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/inspect_tree_source.jpg" alt="inspect_tree_source" /></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-8">
-    <section class="slide-content"><h3 id="taskengine-dag">TaskEngine - DAG</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="8">
+<h3>TaskEngine - DAG</h3>
 <p>Inspect tree sources -&gt; Change a view to see</p>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/dag.jpg" alt="dag"></p>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/dag.jpg" alt="dag" /></p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-9">
-    <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="9">
+<h3>TaksEngine - Scope</h3>
 <p>a full scope in sbt is formed by a <strong>tuple</strong> of a subproject, a configuration, and a task value:</p>
-<pre><code class="lang-scala"><span class="hljs-type">Provided</span> by:
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-type">Provided</span> by:
 <span class="hljs-type">ProjectRef</span>(uri(<span class="hljs-string">"file:/Users/yoga/Documents/workspace/subModule/"</span>), <span class="hljs-string">"submodule"</span>) /
 <span class="hljs-type">Compile</span> /
 sources
-</code></pre>
-<pre><code class="lang-scala">projA / <span class="hljs-type">Compile</span> / console / scalacOptions
-</code></pre>
-<p><i>Usage : you want different task result in different configuration, e.g different source files for Compile and Test</i></p>
-<p><i> Look up:  Delegates</i></p>
+</span></span></foreignObject></svg></code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>projA / <span class="hljs-type">Compile</span> / console / scalacOptions
+</span></span></foreignObject></svg></code></pre>
+<p>&lt;i&gt;Usage : you want different task result in different configuration, e.g different source files for Compile and Test&lt;/i&gt;</p>
+<p>&lt;i&gt; Look up:  Delegates&lt;/i&gt;</p>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-10">
-    <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
-<p>Let&#39;s define a task / setting of ourselves</p>
-<pre><code class="lang-scala"><span class="hljs-comment">//define a task Key</span>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="10">
+<h3>TaksEngine - Scope</h3>
+<p>Let's define a task / setting of ourselves</p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-comment">//define a task Key</span>
 <span class="hljs-keyword">val</span> taskSample = taskKey[<span class="hljs-type">String</span>](<span class="hljs-string">"task sample"</span>)
 <span class="hljs-comment">// give the task an implemention, we can call it an entry for the key</span>
 taskSample := {
@@ -469,13 +183,12 @@ settingSample := {
   println(<span class="hljs-string">"this is in settingSample, should be executed once when session starts"</span>)
   <span class="hljs-string">"Content for SettingSample"</span>
 }
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-11">
-    <section class="slide-content"><h3 id="taksengine-scope">TaksEngine - Scope</h3>
-<p>Let&#39;s implement another task with name &quot;<strong>taskSample</strong>&quot; but <strong>in different scope</strong></p>
-<pre><code class="lang-scala"><span class="hljs-type">ThisBuild</span> / settingSample := <span class="hljs-string">"ThisBuild: Content for SettingSample"</span>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="11">
+<h3>TaksEngine - Scope</h3>
+<p>another task with name &quot;<strong>taskSample</strong>&quot; but <strong>in different scope</strong></p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-type">ThisBuild</span> / settingSample := <span class="hljs-string">"ThisBuild: Content for SettingSample"</span>
 
 <span class="hljs-keyword">val</span> ma = (project in file(<span class="hljs-string">"Ma"</span>)).settings(
   scalaSource in <span class="hljs-type">Compile</span> := baseDirectory.value / <span class="hljs-string">"src"</span>,
@@ -496,26 +209,24 @@ settingSample := {
   },
   name := <span class="hljs-string">"MB"</span>
 )
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-12">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
-<p><strong>It&#39;s not just  Scala! It&#39;s built on Scala.</strong>   </p>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="12">
+<h3>SBT- DSL</h3>
+<p><strong>It's not just  Scala! It's built on Scala.</strong></p>
 <p><a href="https://jazzy.id.au/2012/03/19/three_things_i_had_to_learn_about_scala_before_it_made_sense.html">Three things I had to learn about Scala before it made sense</a></p>
 <p>How do we define dependencies in mvn?</p>
-<pre><code class="lang-mvn">&lt;dependency&gt;
+<pre><code class="language-mvn"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>&lt;dependency&gt;
     &lt;groupId&gt;net.vz.mongodb.jackson&lt;/groupId&gt;
     &lt;artifactId&gt;mongo-jackson-mapper&lt;/artifactId&gt;
     &lt;version&gt;1.4.1&lt;/version&gt;
 &lt;/dependency&gt;
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden  " id="slide-13">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13">
+<h3>SBT- DSL</h3>
 <p>How can we describe a dependency in a scala way?</p>
-<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GroupId</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span></span>) </span>{
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">artifact</span></span>(artifactId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">Artifact</span>(groupId, artifactId)
@@ -527,18 +238,17 @@ settingSample := {
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VersionedArtifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span>, val version: <span class="hljs-type">String</span></span>) </span>{
 }
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 <p>Then we got</p>
-<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>)
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>)
     .artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>)
     .version(<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-14">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14">
+<h3>SBT- DSL</h3>
 <p>Scala methods can be made of <strong>operator characters</strong></p>
-<pre><code class="lang-scala"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
 
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">GroupId</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span></span>) </span>{
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">%</span></span>(artifactId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">Artifact</span>(groupId, artifactId)
@@ -548,90 +258,91 @@ settingSample := {
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">%</span></span>(version: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">VersionedArtifact</span>(groupId, artifactId, version)
 }
 <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">VersionedArtifact</span>(<span class="hljs-params">val groupId: <span class="hljs-type">String</span>, val artifactId: <span class="hljs-type">String</span>, val version: <span class="hljs-type">String</span></span>) </span>{}
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 <p>Then</p>
-<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).%(<span class="hljs-string">"mongo-jackson-mapper"</span>).%(<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).%(<span class="hljs-string">"mongo-jackson-mapper"</span>).%(<span class="hljs-string">"1.4.1"</span>)
+</span></span></foreignObject></svg></code></pre>
 <p>Omit the <code>.</code></p>
-<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>) % (<span class="hljs-string">"mongo-jackson-mapper"</span>) % (<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>) % (<span class="hljs-string">"mongo-jackson-mapper"</span>) % (<span class="hljs-string">"1.4.1"</span>)
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-15">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15">
+<h3>SBT- DSL</h3>
 <p>Scala lets you <strong>implicitly</strong> <strong>convert</strong> any type to any other type</p>
-<pre><code class="lang-scala"><span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
-</code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-keyword">implicit</span> <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">groupId</span></span>(groupId: <span class="hljs-type">String</span>) = <span class="hljs-keyword">new</span> <span class="hljs-type">GroupId</span>(groupId)
+</span></span></foreignObject></svg></code></pre>
 <p>Then when we write down below</p>
-<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span> % <span class="hljs-string">"mongo-jackson-mapper"</span> % <span class="hljs-string">"1.4.1"</span>
-</code></pre>
-<p>It&#39;s equal to </p>
-<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-string">"net.vz.mongodb.jackson"</span> % <span class="hljs-string">"mongo-jackson-mapper"</span> % <span class="hljs-string">"1.4.1"</span>
+</span></span></foreignObject></svg></code></pre>
+<p>It's equal to</p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden  " id="slide-16">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
-<p> <strong>implicitly convert</strong></p>
-<pre><code class="lang-scala"><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.jpg" alt="inspect_source"></p>
-<pre><code class="lang-scala">groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
-</code></pre>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="16">
+<h3>SBT- DSL</h3>
+<p><strong>implicitly convert</strong></p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-string">"net.vz.mongodb.jackson"</span>.artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</span></span></foreignObject></svg></code></pre>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/scala_implicitly.jpg" alt="inspect_source" /></p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>groupId(<span class="hljs-string">"net.vz.mongodb.jackson"</span>).artifact(<span class="hljs-string">"mongo-jackson-mapper"</span>).version(<span class="hljs-string">"1.4.1"</span>)
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-17">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17">
+<h3>SBT- DSL</h3>
 <p>Theres are all <strong>functions</strong>  with  return type are <strong>Def.Setting[T]</strong>  or <strong>Seq[Def.Setting[T]]</strong></p>
-<p>:=   ++   ++=   in </p>
+<p>:=   ++   ++=   in</p>
 <p>Belows are <strong>expressions</strong>! Not <strong>statements</strong>!</p>
-<pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
-</code></pre>
-<p>This is equal to </p>
-<pre><code class="lang-scala">name.setEntry(<span class="hljs-string">"subModule"</span>)
-</code></pre>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>name := <span class="hljs-string">"subModule"</span>
+</span></span></foreignObject></svg></code></pre>
+<p>This is equal to</p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>name.setEntry(<span class="hljs-string">"subModule"</span>)
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-18">
-    <section class="slide-content"><h3 id="sbt-dsl">SBT- DSL</h3>
-<pre><code class="lang-scala">name := <span class="hljs-string">"subModule"</span>
-</code></pre>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="18">
+<h3>SBT- DSL</h3>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>name := <span class="hljs-string">"subModule"</span>
+</span></span></foreignObject></svg></code></pre>
 <ol>
-<li><p>name is an instance of Type <strong>SettingKey</strong></p>
+<li>
+<p>name is an instance of Type <strong>SettingKey</strong></p>
 </li>
-<li><p>calls the <strong>function :=</strong></p>
+<li>
+<p>calls the <strong>function :=</strong></p>
 </li>
-<li><p>with <strong>String parameter</strong> &quot;submodule&quot;</p>
+<li>
+<p>with <strong>String parameter</strong> &quot;submodule&quot;</p>
 </li>
-<li><p>returns a <strong>Setting</strong></p>
+<li>
+<p>returns a <strong>Setting</strong></p>
 </li>
 </ol>
 <p><strong>Q: Look back on the build.sbt, try to explain what happened for the build.sbt you defined?</strong></p>
-<pre><code>//this is a expression!! not a statement
-//this := returns Setting[Task], and the return setting is added into the project&#39;s setting list !!!!
+<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>//this is a expression!! not a statement
+//this := returns Setting[Task], and the return setting is added into the project's setting list !!!!
 //OH MY GOD!!!!ddddddddddddde
-</code></pre></section>
-  </div>
-  <div class="slide hidden" id="slide-19">
-    <section class="slide-content"><h3 id="sbt-project">SBT-Project</h3>
-<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/project-settings.jpg" alt="project-settings"></p>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-20">
-    <section class="slide-content"><h3 id="sbt-user-defined">SBT- User Defined</h3>
-<p><strong>Project is defined by multiple Def.Settings, this settings defined</strong> </p>
-<pre><code>1. what tasks(including setting-task) do we support in this project
-2. what&#39;s unique name for the tasks - the scopes
-3. what&#39;s the dependencies between the tasks
-4. how will the tasks be implemented
-</code></pre><p> <strong>Statement VS Expression</strong></p>
-<pre><code>val settingSample 
-</code></pre><pre><code>:= ++ ++= ...
-should return  Def.Setting[T] or Seq[Def.Setting[T]]
-</code></pre></section>
-  </div>
-  <div class="slide hidden" id="slide-21">
-    <section class="slide-content"><h3 id="aggerate-vs-depend">Aggerate VS Depend</h3>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="19">
+<h3>SBT-Project</h3>
+<p><img src="https://raw.githubusercontent.com/fuqiliang/review/master/share/sbt/pics/project-settings.jpg" alt="project-settings" /></p>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="20">
+<h3>SBT- User Defined</h3>
+<p><strong>Project is defined by multiple Def.Settings, this settings defined</strong></p>
+<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-number">1.</span> what tasks(including setting-task) <span class="hljs-keyword">do</span> we support <span class="hljs-keyword">in</span> this project
+<span class="hljs-number">2.</span> what<span class="hljs-comment">'s unique name for the tasks - the scopes</span>
+<span class="hljs-number">3.</span> what<span class="hljs-comment">'s the dependencies between the tasks</span>
+<span class="hljs-number">4.</span> how will the tasks be implemented
+</span></span></foreignObject></svg></code></pre>
+<p><strong>Statement VS Expression</strong></p>
+<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-attribute">val settingSample</span> 
+</span></span></foreignObject></svg></code></pre>
+<pre><code><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap>:= ++ ++= ...
+should <span class="hljs-keyword">return</span>  Def.Setting[T] <span class="hljs-keyword">or</span> Se<span class="hljs-string">q[Def.Setting[T]</span>]
+</span></span></foreignObject></svg></code></pre>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="21">
+<h3>Aggerate VS Depend</h3>
 <p>aggregate:</p>
 <ul>
 <li>trigger all the tasks of the project you aggregate with</li>
@@ -642,11 +353,10 @@ should return  Def.Setting[T] or Seq[Def.Setting[T]]
 <li>add the compile classes to your class path</li>
 </ul>
 </section>
-  </div>
-  <div class="slide hidden" id="slide-22">
-    <section class="slide-content"><h3 id="why-does-it-fail-how-to-fix-">Why does it fail? How to fix?</h3>
-<p> In Project/CustomeSettings.scala</p>
-<pre><code class="lang-scala"><span class="hljs-keyword">import</span> sbt.{<span class="hljs-type">Setting</span>, taskKey, settingKey}
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="22">
+<h3>Why does it fail?</h3>
+<p>In Project/CustomeSettings.scala</p>
+<pre><code class="language-scala"><svg data-marp-fitting="svg" data-marp-fitting-code><foreignObject><span data-marp-fitting-svg-content><span data-marp-fitting-svg-content-wrap><span class="hljs-keyword">import</span> sbt.{<span class="hljs-type">Setting</span>, taskKey, settingKey}
 
 <span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">CustomeSettings</span> </span>{
 
@@ -664,177 +374,8 @@ should return  Def.Setting[T] or Seq[Def.Setting[T]]
   }
 
 }
-</code></pre>
+</span></span></foreignObject></svg></code></pre>
 </section>
-  </div>
-  <div class="slide hidden author-slide" id="slide-23">
-    <section class="slide-content"><div class="author">
-  <h1 class="name">Yujia Yang</h1>
-    <h3 class="url">
-      <a href="http://jordanscales.com">http://jordanscales.com</a>
-    </h3>
-</div>
-</section>
-  </div>
-
-  <div class="controls">
-    <div class="arrow prev"></div>
-    <div class="arrow next"></div>
-  </div>
-
-
-  <script type="text/javascript">
-    /**
- * Returns the current page number of the presentation.
- */
-function currentPosition() {
-  return parseInt(document.querySelector('.slide:not(.hidden)').id.slice(6));
-}
-
-
-/**
- * Navigates forward n pages
- * If n is negative, we will navigate in reverse
- */
-function navigate(n) {
-  var position = currentPosition();
-  var numSlides = document.getElementsByClassName('slide').length;
-
-  /* Positions are 1-indexed, so we need to add and subtract 1 */
-  var nextPosition = (position - 1 + n) % numSlides + 1;
-
-  /* Normalize nextPosition in-case of a negative modulo result */
-  nextPosition = (nextPosition - 1 + numSlides) % numSlides + 1;
-
-  document.getElementById('slide-' + position).classList.add('hidden');
-  document.getElementById('slide-' + nextPosition).classList.remove('hidden');
-
-  updateProgress();
-  updateURL();
-  updateTabIndex();
-}
-
-
-/**
- * Updates the current URL to include a hashtag of the current page number.
- */
-function updateURL() {
-  try {
-    window.history.replaceState({} , null, '#' + currentPosition());
-  } catch (e) {
-    window.location.hash = currentPosition();
-  }
-}
-
-
-/**
- * Sets the progress indicator.
- */
-function updateProgress() {
-  var progressBar = document.querySelector('.progress-bar');
-
-  if (progressBar !== null) {
-    var numSlides = document.getElementsByClassName('slide').length;
-    var position = currentPosition() - 1;
-    var percent = (numSlides === 1) ? 100 : 100 * position / (numSlides - 1);
-    progressBar.style.width = percent.toString() + '%';
-  }
-}
-
-
-/**
- * Removes tabindex property from all links on the current slide, sets
- * tabindex = -1 for all links on other slides. Prevents slides from appearing
- * out of control.
- */
-function updateTabIndex() {
-  var allLinks = document.querySelectorAll('.slide a');
-  var position = currentPosition();
-  var currentPageLinks = document.getElementById('slide-' + position).querySelectorAll('a');
-  var i;
-
-  for (i = 0; i < allLinks.length; i++) {
-    allLinks[i].setAttribute('tabindex', -1);
-  }
-
-  for (i = 0; i < currentPageLinks.length; i++) {
-    currentPageLinks[i].removeAttribute('tabindex');
-  }
-}
-
-/**
- * Determines whether or not we are currently in full screen mode
- */
-function isFullScreen() {
-  return document.fullscreenElement ||
-         document.mozFullScreenElement ||
-         document.webkitFullscreenElement ||
-         document.msFullscreenElement;
-}
-
-/**
- * Toggle fullScreen mode on document element.
- * Works on chrome (>= 15), firefox (>= 9), ie (>= 11), opera(>= 12.1), safari (>= 5).
- */
-function toggleFullScreen() {
-  /* Convenient renames */
-  var docElem = document.documentElement;
-  var doc = document;
-
-  docElem.requestFullscreen =
-      docElem.requestFullscreen ||
-      docElem.msRequestFullscreen ||
-      docElem.mozRequestFullScreen ||
-      docElem.webkitRequestFullscreen.bind(docElem, Element.ALLOW_KEYBOARD_INPUT);
-
-  doc.exitFullscreen =
-      doc.exitFullscreen ||
-      doc.msExitFullscreen ||
-      doc.mozCancelFullScreen ||
-      doc.webkitExitFullscreen;
-
-  isFullScreen() ? doc.exitFullscreen() : docElem.requestFullscreen();
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-  // Update the tabindex to prevent weird slide transitioning
-  updateTabIndex();
-
-  // If the location hash specifies a page number, go to it.
-  var page = window.location.hash.slice(1);
-  if (page) {
-    navigate(parseInt(page) - 1);
-  }
-
-  document.onkeydown = function (e) {
-    var kc = e.keyCode;
-
-    // left, down, H, J, backspace, PgUp - BACK
-    // up, right, K, L, space, PgDn - FORWARD
-    // enter - FULLSCREEN
-    if (kc === 37 || kc === 40 || kc === 8 || kc === 72 || kc === 74 || kc === 33) {
-      navigate(-1);
-    } else if (kc === 38 || kc === 39 || kc === 32 || kc === 75 || kc === 76 || kc === 34) {
-      navigate(1);
-    } else if (kc === 13) {
-      toggleFullScreen();
-    }
-  };
-
-  if (document.querySelector('.next') && document.querySelector('.prev')) {
-    document.querySelector('.next').onclick = function (e) {
-      e.preventDefault();
-      navigate(1);
-    };
-
-    document.querySelector('.prev').onclick = function (e) {
-      e.preventDefault();
-      navigate(-1);
-    };
-  }
-});
-
-
-  </script>
-</body>
-</html>
+</foreignObject></svg></article><script>!function(){"use strict";function e(e){var n=i([["iOS",/iP(hone|od|ad)/],["Android OS",/Android/],["BlackBerry OS",/BlackBerry|BB10/],["Windows Mobile",/IEMobile/],["Amazon OS",/Kindle/],["Windows 3.11",/Win16/],["Windows 95",/(Windows 95)|(Win95)|(Windows_95)/],["Windows 98",/(Windows 98)|(Win98)/],["Windows 2000",/(Windows NT 5.0)|(Windows 2000)/],["Windows XP",/(Windows NT 5.1)|(Windows XP)/],["Windows Server 2003",/(Windows NT 5.2)/],["Windows Vista",/(Windows NT 6.0)/],["Windows 7",/(Windows NT 6.1)/],["Windows 8",/(Windows NT 6.2)/],["Windows 8.1",/(Windows NT 6.3)/],["Windows 10",/(Windows NT 10.0)/],["Windows ME",/Windows ME/],["Open BSD",/OpenBSD/],["Sun OS",/SunOS/],["Linux",/(Linux)|(X11)/],["Mac OS",/(Mac_PowerPC)|(Macintosh)/],["QNX",/QNX/],["BeOS",/BeOS/],["OS/2",/OS\/2/],["Search Bot",/(nuhk)|(Googlebot)|(Yammybot)|(Openbot)|(Slurp)|(MSNBot)|(Ask Jeeves\/Teoma)|(ia_archiver)/]]).filter(function(n){return n.rule&&n.rule.test(e)})[0];return n?n.name:null}function n(){return"undefined"!=typeof process&&process.version&&{name:"node",version:process.version.slice(1),os:process.platform}}function t(n){var t=i([["aol",/AOLShield\/([0-9\._]+)/],["edge",/Edge\/([0-9\._]+)/],["yandexbrowser",/YaBrowser\/([0-9\._]+)/],["vivaldi",/Vivaldi\/([0-9\.]+)/],["kakaotalk",/KAKAOTALK\s([0-9\.]+)/],["samsung",/SamsungBrowser\/([0-9\.]+)/],["chrome",/(?!Chrom.*OPR)Chrom(?:e|ium)\/([0-9\.]+)(:?\s|$)/],["phantomjs",/PhantomJS\/([0-9\.]+)(:?\s|$)/],["crios",/CriOS\/([0-9\.]+)(:?\s|$)/],["firefox",/Firefox\/([0-9\.]+)(?:\s|$)/],["fxios",/FxiOS\/([0-9\.]+)/],["opera",/Opera\/([0-9\.]+)(?:\s|$)/],["opera",/OPR\/([0-9\.]+)(:?\s|$)$/],["ie",/Trident\/7\.0.*rv\:([0-9\.]+).*\).*Gecko$/],["ie",/MSIE\s([0-9\.]+);.*Trident\/[4-7].0/],["ie",/MSIE\s(7\.0)/],["bb10",/BB10;\sTouch.*Version\/([0-9\.]+)/],["android",/Android\s([0-9\.]+)/],["ios",/Version\/([0-9\._]+).*Mobile.*Safari.*/],["safari",/Version\/([0-9\._]+).*Safari/],["facebook",/FBAV\/([0-9\.]+)/],["instagram",/Instagram\s([0-9\.]+)/],["ios-webview",/AppleWebKit\/([0-9\.]+).*Mobile/]]);if(!n)return null;var o=t.map(function(e){var t=e.rule.exec(n),i=t&&t[1].split(/[._]/).slice(0,3);return i&&i.length<3&&(i=i.concat(1==i.length?[0,0]:[0])),t&&{name:e.name,version:i.join(".")}}).filter(Boolean)[0]||null;return o&&(o.os=e(n)),/alexa|bot|crawl(er|ing)|facebookexternalhit|feedburner|google web preview|nagios|postrank|pingdom|slurp|spider|yahoo!|yandex/i.test(n)&&((o=o||{}).bot=!0),o}function i(e){return e.map(function(e){return{name:e[0],rule:e[1]}})}var o=function(){return"undefined"!=typeof navigator?t(navigator.userAgent):n()},r=o;let s;const a=["android","bb10","crios","facebook","fxios","instagram","ios-webview","ios","phantomjs","safari"];function l(){Array.from(document.getElementsByTagName("svg"),e=>{if(e.hasAttribute("data-marpit-svg")){const{clientHeight:n,clientWidth:t}=e;e.style.transform||(e.style.transform="translateZ(0)");const{width:i,height:o}=e.viewBox.baseVal,r=Math.min(n/o,t/i);Array.from(e.querySelectorAll(":scope > foreignObject"),e=>{const s=e.x.baseVal.value,a=e.y.baseVal.value;Array.from(e.querySelectorAll(":scope > section"),e=>{e.style.transformOrigin||(e.style.transformOrigin="0 0");const l=(t-r*i)/2-s,d=(n-r*o)/2-a;e.style.transform=`translate3d(${l}px,${d}px,0) scale(${r}) translate(${s}px,${a}px)`})})}})}const d="data-marp-fitting",c="data-marp-fitting-code",u="data-marp-fitting-math",f=(e,n,t)=>{if(e.getAttribute(n)!==t)return e.setAttribute(n,t),!0};!function(e=!0){const n=()=>{for(const e of function(){if(!s){s=[];const{name:e}=r()||{};a.includes(e)&&s.push(l)}return s}())e();Array.from(document.querySelectorAll(`svg[${d}="svg"]`),e=>{const n=e.firstChild,t=n.firstChild,{scrollWidth:i,scrollHeight:o}=t;let r,s=1;if(e.hasAttribute(c)&&(r=e.parentElement.parentElement),e.hasAttribute(u)&&(r=e.parentElement),r){const e=getComputedStyle(r),n=Math.ceil(r.clientWidth-parseFloat(e.paddingLeft)-parseFloat(e.paddingRight));n&&(s=n)}const a=Math.max(i,s),l=Math.max(o,1),d=`0 0 ${a} ${l}`;f(n,"width",`${a}`),f(n,"height",`${l}`),f(e,"preserveAspectRatio",getComputedStyle(e).getPropertyValue("--preserve-aspect-ratio")||"xMinYMin meet"),f(e,"viewBox",d)&&e.classList.toggle("__reflow__")}),e&&window.requestAnimationFrame(n)};n()}()}();
+</script><script>!function(){"use strict";var e={from:function(e,n){var t=1===(e.parent||e).nodeType?e.parent||e:document.querySelector(e.parent||e),r=[].filter.call("string"==typeof e.slides?t.querySelectorAll(e.slides):e.slides||t.children,function(e){return"SCRIPT"!==e.nodeName}),i=r[0],o={},l=function(e,n){r[e]&&(a("deactivate",u(i,n)),i=r[e],a("activate",u(i,n)))},s=function(e,n){var t=r.indexOf(i)+e;a(e>0?"next":"prev",u(i,n))&&l(t,n)},c=function(e,n){o[e]=(o[e]||[]).filter(function(e){return e!==n})},a=function(e,n){return(o[e]||[]).reduce(function(e,t){return e&&!1!==t(n)},!0)},u=function(e,n){return(n=n||{}).index=r.indexOf(e),n.slide=e,n},d={on:function(e,n){return(o[e]||(o[e]=[])).push(n),c.bind(null,e,n)},off:c,fire:a,slide:function(e,n){if(!arguments.length)return r.indexOf(i);a("slide",u(r[e],n))&&l(e,n)},next:s.bind(null,1),prev:s.bind(null,-1),parent:t,slides:r};return(n||[]).forEach(function(e){e(d)}),l(0),d}},n=function(){return function(e){e.slides.forEach(function(e){e.addEventListener("keydown",function(e){(/INPUT|TEXTAREA|SELECT/.test(e.target.nodeName)||"true"===e.target.contentEditable)&&e.stopPropagation()})})}};function t(e){e.parent.classList.add("bespoke-marp-parent"),e.slides.map(e=>e.classList.add("bespoke-marp-slide")),e.on("activate",n=>{e.slides.map(e=>e.classList.remove("bespoke-marp-active")),n.slide.classList.add("bespoke-marp-active")})}function r(e=2e3){return n=>{let t;function r(){t&&clearTimeout(t),t=setTimeout(()=>{n.parent.classList.add("bespoke-marp-cursor-inactive")},e),n.parent.classList.remove("bespoke-marp-cursor-inactive")}document.addEventListener("mousedown",r),document.addEventListener("mousemove",r),setTimeout(r,0)}}var i,o=(function(e){var n,t,r,i,o,l;n="undefined"!=typeof window&&void 0!==window.document?window.document:{},t=e.exports,r="undefined"!=typeof Element&&"ALLOW_KEYBOARD_INPUT"in Element,i=function(){for(var e,t=[["requestFullscreen","exitFullscreen","fullscreenElement","fullscreenEnabled","fullscreenchange","fullscreenerror"],["webkitRequestFullscreen","webkitExitFullscreen","webkitFullscreenElement","webkitFullscreenEnabled","webkitfullscreenchange","webkitfullscreenerror"],["webkitRequestFullScreen","webkitCancelFullScreen","webkitCurrentFullScreenElement","webkitCancelFullScreen","webkitfullscreenchange","webkitfullscreenerror"],["mozRequestFullScreen","mozCancelFullScreen","mozFullScreenElement","mozFullScreenEnabled","mozfullscreenchange","mozfullscreenerror"],["msRequestFullscreen","msExitFullscreen","msFullscreenElement","msFullscreenEnabled","MSFullscreenChange","MSFullscreenError"]],r=0,i=t.length,o={};r<i;r++)if((e=t[r])&&e[1]in n){for(r=0;r<e.length;r++)o[t[0][r]]=e[r];return o}return!1}(),o={change:i.fullscreenchange,error:i.fullscreenerror},l={request:function(e){return new Promise(function(t){var o=i.requestFullscreen,l=function(){this.off("change",l),t()}.bind(this);e=e||n.documentElement,/ Version\/5\.1(?:\.\d+)? Safari\//.test(navigator.userAgent)?e[o]():e[o](r?Element.ALLOW_KEYBOARD_INPUT:{}),this.on("change",l)}.bind(this))},exit:function(){return new Promise(function(e){var t=function(){this.off("change",t),e()}.bind(this);n[i.exitFullscreen](),this.on("change",t)}.bind(this))},toggle:function(e){return this.isFullscreen?this.exit():this.request(e)},onchange:function(e){this.on("change",e)},onerror:function(e){this.on("error",e)},on:function(e,t){var r=o[e];r&&n.addEventListener(r,t,!1)},off:function(e,t){var r=o[e];r&&n.removeEventListener(r,t,!1)},raw:i},i?(Object.defineProperties(l,{isFullscreen:{get:function(){return Boolean(n[i.fullscreenElement])}},element:{enumerable:!0,get:function(){return n[i.fullscreenElement]}},enabled:{enumerable:!0,get:function(){return Boolean(n[i.fullscreenEnabled])}}}),t?e.exports=l:window.screenfull=l):t?e.exports=!1:window.screenfull=!1}(i={exports:{}},i.exports),i.exports);function l(){document.addEventListener("keydown",e=>{70!==e.which&&122!==e.which||e.altKey||e.ctrlKey||e.metaKey||!o.enabled||(o.toggle(document.body),e.preventDefault())})}function s(e={}){const n=Object.assign({history:!0},e);return e=>{function t(){const n=parseInt(window.location.hash.slice(1),10);Number.isNaN(n)||function(n){const t=Math.max(0,Math.min(n,e.slides.length-1));t!==e.slide()&&e.slide(t)}(n-1)}setTimeout(()=>{t(),e.on("activate",e=>{n.history?window.location.hash=e.index+1:window.location.replace(`#${e.index+1}`)}),window.addEventListener("hashchange",t)},0)}}var c,a=function(e){return function(n){var t="vertical"!==e;document.addEventListener("keydown",function(e){(34==e.which||32==e.which&&!e.shiftKey||t&&39==e.which||!t&&40==e.which)&&n.next(),(33==e.which||32==e.which&&e.shiftKey||t&&37==e.which||!t&&38==e.which)&&n.prev()})}};function u(e={}){const n=Object.assign({interval:200},e);return e=>{a()(e),document.addEventListener("keydown",n=>{35===n.which&&e.slide(e.slides.length-1),36===n.which&&e.slide(0),38===n.which&&e.prev(),40===n.which&&e.next()});let t,r,i=0;e.parent.addEventListener("wheel",o=>{let l=!1;const s=(e,n)=>{e&&(l=l||function(e,n){return function(e,n){const t=n===c.X?"Width":"Height";return e[`client${t}`]<e[`scroll${t}`]}(e,n)&&function(e,n){const{overflow:t}=e,r=e[`overflow${n}`];return"auto"===t||"scroll"===t||"auto"===r||"scroll"===r}(getComputedStyle(e),n)}(e,n)),e&&e.parentElement&&s(e.parentElement,n)};if(0!==o.deltaX&&s(o.target,c.X),0!==o.deltaY&&s(o.target,c.Y),l)return;o.preventDefault(),r&&clearTimeout(r),r=setTimeout(()=>{t=0},n.interval);const a=Date.now()-i<n.interval,u=Math.sqrt(Math.pow(o.deltaX,2)+Math.pow(o.deltaY,2)),d=u<=t;if(t=u,a||d)return;let f;(o.deltaX>0||o.deltaY>0)&&(f="next"),(o.deltaX<0||o.deltaY<0)&&(f="prev"),f&&(e[f](),i=Date.now())})}}!function(e){e.X="X",e.Y="Y"}(c||(c={}));const d=".bespoke-progress-parent > .bespoke-progress-bar";function f(e){e.on("activate",n=>{document.querySelectorAll(d).forEach(t=>{t.style.flexBasis=`${100*n.index/(e.slides.length-1)}%`})})}function h(e={}){const n=Object.assign({slope:Math.tan(-35*Math.PI/180),swipeThreshold:30},e);return e=>{let t;const r=e.parent,i=e=>{const n=r.getBoundingClientRect();return{x:e.pageX-(n.left+n.right)/2,y:e.pageY-(n.top+n.bottom)/2}};r.addEventListener("touchstart",e=>{t=1===e.touches.length?i(e.touches[0]):void 0}),r.addEventListener("touchmove",e=>{if(t)if(1===e.touches.length){e.preventDefault();const n=i(e.touches[0]),r=n.x-t.x,o=n.y-t.y;t.delta=Math.sqrt(Math.pow(Math.abs(r),2)+Math.pow(Math.abs(o),2)),t.radian=Math.atan2(r,o)}else t=void 0}),r.addEventListener("touchend",()=>{if(t){if(t.delta&&t.delta>=n.swipeThreshold){let r=t.radian-n.slope;r=(r+Math.PI)%(2*Math.PI)-Math.PI,e[r<0?"next":"prev"]()}t=void 0}})}}e.from(document.getElementById("presentation"),[n(),t,r(),s({history:!1}),u(),l,f,h()])}();
+</script></body></html>
