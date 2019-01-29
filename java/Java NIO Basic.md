@@ -147,7 +147,7 @@ Selector.select()方法会**阻塞**直至有对应注册事件产生。
 
 一个简单的NIO  Server的模型如下：
 
-![image-20190128223928684](/Users/yoga/Library/Application Support/typora-user-images/nio-server.png)
+![image-20190128223928684](https://raw.githubusercontent.com/fuqiliang/review/master/java/pictures/nio-server.png)
 
 重点在于
 
