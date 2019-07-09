@@ -37,7 +37,7 @@ stream match {
    Empty => println()
 }
 ```
-![streaming-chain](/Users/yoga/Documents/workspace/review/scala/c5_stream_chain.png)
+![streaming-chain](https://raw.githubusercontent.com/fuqiliang/review/master/scala/c5_stream_chain.png)
 应用这个特性，甚至可以定义无穷，在无穷上做操作，神奇！
 
 ```
@@ -49,7 +49,7 @@ scala> ones.exists(_ % 2 != 0)
 res1: Boolean = true
 ```
 
-![inifinate](/Users/yoga/Documents/workspace/review/scala/c5_one.png)
+![inifinate](https://raw.githubusercontent.com/fuqiliang/review/master/scala/c5_one.png)
 
 
 
@@ -72,7 +72,7 @@ case class Right[+A](value: A) extends Either[Nothing, A]
 >  functional data structures are by definition immutable. 
 >  Doesn’t this mean we end up doing a lot of extra copying of the data? Perhaps surprisingly, the answer is no.
 
-![data sharing](/Users/yoga/Documents/workspace/review/scala/c2_data_sharing.png)
+![data sharing](https://raw.githubusercontent.com/fuqiliang/review/master/scala/c2_data_sharing.png)
 
 ###  Chapter 2
 递归和迭代
