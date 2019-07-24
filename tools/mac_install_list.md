@@ -1,9 +1,15 @@
 1. Idea : https://www.jetbrains.com/idea/
+
 2. sublime :https://www.sublimetext.com/
+
 3. app cleaner: 
+
 4. oh-my-zsh: https://github.com/robbyrussell/oh-my-zsh/wiki
+
 5. 修改computer name: http://yacca.github.io/2013/08/13/hostname-in-mac-osx.html
+
 6. brew : https://brew.sh/
+
 7. install java8:
 
    brew tap caskroom/versions
@@ -19,4 +25,8 @@
    https://github.com/gcuisinier/jenv/issues/167
 
 9. mvn
+
 10. mac three-finger drug : https://support.apple.com/en-us/HT204609
+
+11. mac contexts: https://contexts.co/
+
