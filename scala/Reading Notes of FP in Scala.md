@@ -5,13 +5,6 @@ https://learning.oreilly.com/library/view/functional-programming-in/978161729065
 
 ### Chapter 6
 
------
-
-最近看乐队的夏天，第一次被一个综艺感动到。
-音乐可以有那么多可能性以及多样性，我自己本身是否也可以尝试一些新的东西、接受一些新的视角、代入一些新的角色？失败大概也没什么大不了的。
-不过，想再多，也只是个打工的。哈哈，囧。
-
------
 
 以随机数生成为例，传统的Java的random方法里，每次调用会改变内部Random seed的值，使得方法不具备refrence transparent.
 
