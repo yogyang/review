@@ -46,3 +46,8 @@ git remote rm repo-A-branch
 
 ```
 
+
+
+### Git clone clone too slow
+
+<https://www.cnblogs.com/cy521/p/10948235.html>

@@ -179,8 +179,7 @@ micro-batch 的运行原理：
    那么用spark接入该kafka的时候，输入源DF就是3个partition, 一次 job ->  consumer-group, 每个executor就对应着一个executor?
 3.  spark 流计算micro-batch模式下原理是到点进行切割成一个小batch , 计算应该是以这个batch为一个job单位，那么一次流计算对应的DF是不是对应着多个RDD？
 4. DStream在structure Streaming 里是不是还是作为底层实现在使用？
-
-
+5. 如果DStream里对应着多个RDD batch，那么当使用windows的时候，如果window的滑动窗口大小跨了batch，那是不是涉及到多个RDD的之间的数据聚合？这个在基于event time的处理上也是一样的， 比如1条消息event time 是在第1s产生，process time是第10s, windows(5,5)，那么这条数据到底落在哪个batch里？？？
 
 
 ### Reference
