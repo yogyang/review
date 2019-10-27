@@ -37,7 +37,7 @@ protected long computeSplitSize(long goalSize, long minSize, long blockSize) {
 
 作者给的代码入口就是HadoopRDD.getPartition -> FileInputFormat.getSplits
 
-![image-20191027212551556](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case2_1.png)
+![image-20191027212551556](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case2_1.png)
 
 线上读取的s3文件，应该s3对应的实现。
 

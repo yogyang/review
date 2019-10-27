@@ -36,7 +36,7 @@ group by a
 
 对应的执行stage图如：
 
-![ case4_1](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/ case4_1.png)
+![ case4_1](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/ case4_1.png)
 
 
 
@@ -46,13 +46,13 @@ group by a
 
 1. join对应的SparkUI数据对比如下：
 
-   ![case4_2](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case4_2.png)
+   ![case4_2](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case4_2.png)
 
    从图可以看到143.4G join 一个170M的表，按照大表join小表的优化思路，可以将小表进行广播，避免join触发的这两次shuffle.
 
 2.   当我们避免了t3数据按照c重分布之后，我们可以来理一下源数据的重分布路线
 
-   ![case4_3](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case4_3.png)
+   ![case4_3](<https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case4_3.png>)
 
   这种情况下, 每次的重分布都是一次宽依赖，需要进行shuffle。
   而这三次的数据重新分布都是以a开始，那么如果一开始就将源数据以a进行数据repartition，那么这三次宽依赖是否都可以变成窄依赖？
@@ -61,7 +61,7 @@ group by a
 按照上面的思路，我们重写了一下SQL，提交执行
 新的stage图：
 中间所有的shuffle过程消失了！
-![case4_4](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case4_4.png)
+![case4_4](<https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case4_4.png>)
 Join也变成了BroadcastJoin。
 
 然而，这个SQL的执行时间并没有减少，可能还是数据量太小了吧。

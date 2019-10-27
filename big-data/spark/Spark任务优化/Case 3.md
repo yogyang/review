@@ -38,9 +38,9 @@ df
 
 这一段对应的SparkUI DAG图如下：
 
-![case3_dag1](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case3_dag1.png)
+![case3_dag1](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case3_dag1.png)
 
-![case3_dag_time1](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case3_dag_time1.png)
+![case3_dag_time1](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case3_dag_time1.png)
 
 我们对照代码来看，每个stage的耗时，
 
@@ -55,7 +55,7 @@ df
 1.	30 min的repartition是否有必要？
 	之前说过repartition的意义在于取出数据倾斜，那么可以从Stage 36的输入/输出对比下是否存在数据倾斜 执行时长跨度为3s-30s，输入数据差距15M-97M,这种程度的倾斜用30min来进行重分布，实在是性价比太低。而且97M的最大数据，对后面的复杂计算能有多大影响？再之，这条SQL之后，本身就有各种数据充分，这一步repartition可以考虑省略。 
 	
-	![case3_input](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case3_input.png)
+	![case3_input](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case3_input.png)
 	
 2. 先按照（"t_id", "pvid", "mid", "time_stamp", "uid", "pid", "current_url", "country", "gender","app_version", "price", "from_page"）进行了一次去重复，之后再按照("t_id", "pvid", "mid", "uid", "pid", "pid_old")进行去重。 
 
@@ -92,7 +92,7 @@ df
 
 新代码上了之后，这一段对应执行情况
 
-![case3_dag2](/Users/yoga/Documents/workspace/review/big-data/spark/Spark任务优化/case3_dag2.png)
+![case3_dag2](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/case3_dag2.png)
 
 两个stage完成了最后16.4G的输出，耗时10min+
 
