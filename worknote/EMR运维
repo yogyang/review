@@ -20,6 +20,9 @@ https://aws.amazon.com/cn/premiumsupport/knowledge-center/restart-service-emr/
 sudo yarn rmadmin -refreshQueues
 yarn application -kill application_1569748399237_0200
 
-/usr/lib/jvm/java-openjdk/bin/java -server -Xmx10240m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:MaxHeapFreeRatio=70 -XX:+CMSClassUnloadingEnabled -XX:OnOutOfMemoryError=kill -9 %p -Djava.io.tmpdir=/mnt/yarn/usercache/hadoop/appcache/application_1569748399237_0491/container_1569748399237_0491_01_000356/tmp -Dspark.driver.port=46751 -Dspark.history.ui.port=18080 -Dspark.yarn.app.container.log.dir=/var/log/hadoop-yarn/containers/application_1569748399237_0491/container_1569748399237_0491_01_000356 org.apache.spark.executor.CoarseGrainedExecutorBackend --driver-url spark://CoarseGrainedScheduler@ip-172-31-20-22.us-west-2.compute.internal:46751 --executor-id 37 --hostname ip-172-31-19-184.us-west-2.compute.internal --cores 4 --app-id application_1569748399237_0491 --user-class-path file:/mnt/yarn/usercache/hadoop/appcache/application_1569748399237_0491/container_1569748399237_0491_01_000356/__app__.jar
+df -lh
+sudo du -h --max-depth=1
+sudo su - yarn -c "rm -rf /mnt/yarn/usercache"
+df /var/log/hadoop-yarn/
 
----
+/usr/lib/jvm/java-openjdk/bin/java -server -Xmx10240m -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=70 -XX:MaxHeapFreeRatio=70 -XX:+CMSClassUnloadingEnabled -XX:OnOutOfMemoryError=kill -9 %p -Djava.io.tmpdir=/mnt/yarn/usercache/hadoop/appcache/application_1569748399237_0491/container_1569748399237_0491_01_000356/tmp -Dspark.driver.port=46751 -Dspark.history.ui.port=18080 -Dspark.yarn.app.container.log.dir=/var/log/hadoop-yarn/containers/application_1569748399237_0491/container_1569748399237_0491_01_000356 org.apache.spark.executor.CoarseGrainedExecutorBackend --driver-url spark://CoarseGrainedScheduler@ip-172-31-20-22.us-west-2.compute.internal:46751 --executor-id 37 --hostname ip-172-31-19-184.us-west-2.compute.internal --cores 4 --app-id application_1569748399237_0491 --user-class-path file:/mnt/yarn/usercache/hadoop/appcache/application_1569748399237_0491/container_1569748399237_0491_01_000356/__app__.jar

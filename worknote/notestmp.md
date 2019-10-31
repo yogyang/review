@@ -1,5 +1,31 @@
 
+### Zeppelin
 
+EMR默认日志：/var/log/xxx
+EMR默认配置:/etc/xxx/conf
+
+启动Spark Interpreter log
+```
+INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} SparkInterpreterLauncher.java[buildEnvFromProperties]:113) - ZEPPELIN_SPARK_CONF:  --master
+ yarn-client --conf spark.yarn.dist.archives=/usr/lib/spark/R/lib/sparkr.zip#sparkr --conf spark.jars='s3://jiayun.spark.data/yangjieyu/xgb_lr_
+rank/xgboost4j-0.90.jar,s3://jiayun.spark.data/yangjieyu/xgb_lr_rank/xgboost4j-spark-0.90.jar' --conf spark.executor.memory='8g' --conf spark.y
+arn.isPython=true --conf spark.app.name='Zeppelin-spark' --conf spark.driver.maxResultSize='2g' --conf spark.home='/usr/lib/spark'
+ INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} SparkInterpreterLauncher.java[buildEnvFromProperties]:139) - Run Spark under non-secure mod
+e as no keytab and principal is specified
+ INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} RemoteInterpreterManagedProcess.java[start]:115) - Thrift server for callback will start. P
+ort: 35493
+ INFO [2019-10-22 06:03:46,663] ({pool-2-thread-34} RemoteInterpreterManagedProcess.java[start]:190) - Run interpreter process [/usr/lib/zeppel
+in/bin/interpreter.sh, -d, /usr/lib/zeppelin/interpreter/spark, -c, 172.31.20.22, -p, 35493, -r, :, -l, /usr/lib/zeppelin/local-repo/spark, -g,
+ spark]
+```
+
+集群A上Zeppelin Spark如何向集群B的yarn提交：
+1. 将B的hadoop conf直接拷到A，A 的hadoop conf 重定向到新conf 
+
+
+---
+
+### Glue
 
 
 ---
@@ -19,6 +45,17 @@ load data inpath '/input/edata' into table et;
 内部表和外部表建表时都可以自己指定location
 删除表时，外部表不会删除对应的数据，只会删除元数据信息，内部表则会删除
 
+#### hive 101
+
+Hive就是一个SQL解析引擎，将SQL语句转化为相应的MapReduce程序
+
+http://xiaqunfeng.cc/2018/10/18/Hive/
+
+#### hive基本命令
+
+show partitions table_name;
+describe formatted external_pro_db.user_trace partition (log_date='2019-10-27');
+
 
 
 ------
@@ -28,7 +65,7 @@ load data inpath '/input/edata' into table et;
 Spark GC 问题. 
 http://ju.outofmemory.cn/entry/363883
 https://blog.csdn.net/bmwopwer1/article/details/71947137
-
+https://matt33.com/2018/07/28/jvm-cms/
 
 1. spark schdeuler delay一直很大. ms schduler delay
 2. coalesce 貌似有时不生效，生效后 105个core,coalesce(100) scheduler delay还是比较大
@@ -39,49 +76,104 @@ https://blog.csdn.net/bmwopwer1/article/details/71947137
 5. shuffle write/ cache的size会是shuffle write的2倍
    Shuffle Write Size / Shuffle Spill(Memory) / Shuffle Spill(Disk) 
    https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-webui-StagePage.html
+6. Spark内部何时回skip stages,有一些RDD自动cache了？  
 
-#### Spark优化案例
- 
-  1. 注意中间计算结果重用
-  ```
-  for (i <- 0 util len) {
-  	df = df.withColumn("c"+i, $"value".split(",")(i))
-  }
-  ```
-  这类问题会导致大量的重复split产生，且当$value本身数据很大时候，会导致大量的Java临时对象产生，youngGC也会非常严重，改成复用split()的结果，线上从40min -> 10min
-  当业务方由于逻辑过于复杂，不想先进行code review时候，可以先给executor.extraJavaOption传入-Xmn 扩大一下新生代比例，可以稍微解决一下GC的问题。
-  这个案例中有非常有意思的发现，即yarn启动的container并不会将Xms=Xmx,xms 默认还是1/64的机器内存，而且貌似JVM在老年代资源一直占据不多时，不会进行堆扩容。
-  这就直接导致了线上任务一直处于可用堆2G，新生代大概500M的状况，加剧了GC的恶化。
+#### functions
 
-  2. 输入数据本身倾斜很大，最小16K，最大3.2G,任务数据分配极不均匀，最后job等3.2G的任务执行完就花了35min
-  将数据先进行repartition(500)后再运算，线上40min -> 20min. 其实单纯的数据repartition并不怎么耗时，在进行复杂的计算之前，越要注意数据均分。
+---
 
-  3. sql join 小表，嵌套groupby
-  线上一条SQL类似
-  ```
-  select a, sum(price), sum(arrive), sum(xxxx)
-     select a, b, sum(price)
-		  from
-		   (
-		   	select a, c, sum(aColumnName)
-		   	from (
-		   		select a,b,aColumnName
-		   		from t1
-		   		) t2 group by 1,2
-		   ) t3 join dimensionT
-		   on t3.c = dimensionT.c
-	   group by 1,2
-   group by a
-  ```
-  这条SQL很有意思，它在SparkUI里对应的SQL图和job stage图分别为
-  从SQL图可以看到，触发了SortMergeJoin,对应SQL的 join dimensionT on t3.c = dimensionT.c, 而且dimensionT输入才170M+,另外一张表200G+，也就是大表Join小表。SortMergeJoin会触发两个输入表按照c进行重分布的shuffle，即对应着stage 3 4.
+filter:
 
-  从job stage图中，可以看出，每次group by 都出发了一次shuffle, 对应stage的5，6，7
+```
+originDF.filter(col("gender") === "F") // === && ==
+originDF.filter("gender == 'F'")
 
-  这个任务的优化我从两个方面进行考虑
-  a. 大表join小表，改成broadcast(小表)，即写成df.join(broadcast(dimensionT), "pid")
-  b. SQL中的每次group by都是以a为开头，那么如果我一开始就把数据按照a进行repartition, 后面所有的group by都将变成窄依赖，将减少3次shuffle
-  按照这个思路改完代码后，
+```
+
+---
+
+window:
+
+```
+import sparkSession.implicits._
+    val originDF = sparkSession.read
+      .option("header", false)
+      .option("inferSchema", true)
+      .format("csv")
+      .load(inputPath)
+      .toDF("name", "course", "grade")
+      .withColumn("grade", col("grade").cast(DoubleType))
+      .as[Record]
+
+    val overCourse = Window.partitionBy("course")
+    val df1 = originDF.withColumn("average_grade", avg("grade") over overCourse)
+    df1.show(false)
+    df1.printSchema()
+
+    val df2 = originDF.withColumn("col_test", collect_list("grade") over overCourse.orderBy("grade"))
+    df2.show(false)
+
+    val overPerson = Window.partitionBy("name")
+    val df3 = originDF.withColumn("avg_grade_person", avg("grade") over overPerson)
+        .withColumn("avg_grade_course", avg("grade") over overCourse)
+    df3.show(false)
+
+
+
+    val df4 = originDF
+      .withColumn("struct_test", struct(
+        col("grade").alias("g"),col("course").alias("c")
+      ))
+        .groupBy("name")
+        .agg(collect_list("struct_test").alias("array_s"))
+        .withColumn("sort_array", sort_array(col("array_s")))
+    df4.show(false)
+
+
+```
+https://knockdata.github.io/spark-window-function/
+
+---
+
+a. groupBy
+b. cache源码
+c. Spark堆外内存的使用 
+d. spark dataframe filter => col("gender") === 'F'
+e. repartionBy("c0_1",1000) -> 到底几个partition有数据，数据是如何分布的
+f. spark 读取hive的多级目录失败，
+g. spark locality_level https://www.jianshu.com/p/05034a9c8cae
+h. collect_list with order
+
+
+#### Spark元数据过期
+```
+java.io.FileNotFoundException: No such file or directory 's3://xxxxxx/date_id=2019-10-20/000002_0'
+It is possible the underlying files have been updated. You can explicitly invalidate the cache in Spark by running 'REFRESH TABLE tableName' command in SQL or by recreating the Dataset/DataFrame involved.
+```
+
+https://github.com/cjuexuan/mynote/issues/32
+https://blog.csdn.net/zyzzxycj/article/details/85166571
+
+#### 内存爆
+
+```
+Container killed by YARN for exceeding memory limits. 11.1 GB of 11 GB physical memory used. Consider boosting spark.yarn.executor.memoryOverhead or disabling
+```
+
+#### EMR上SparkUIdriver里打印的ip:host不对
+通过报错发现，ApplicationMaster对应的跳转链接为：http://ip1:4047，而airflow中显示的driver日志如下
+
+INFO - Subtask: 19/10/31 08:49:39 INFO SparkUI: Bound SparkUI to 0.0.0.0, and started at ip1:4047
+
+而通过Airflow调度执行的机器为 ip2，即spark-submit指定的机器IP为ip2,启动模式为yarn-client，所以SparkUI 的访问地址应该是ip2:4047
+查看Spark源码可以发现，
+
+
+查看/usr/lib/spark/conf/spark-env.sh可以看到，
+
+EMR写死了PUBLIC_DNS,嗯, EMR 你真棒！
+
+
 
 
 ---
@@ -122,17 +214,20 @@ A：相应节点的本地磁盘目录写满，导致报警。 清理相应目录
 
 
 #### Crontab语法
+
+```
 minute   hour   day   month   week   command 
 星号（*）：代表所有可能的值，例如month字段如果是星号，则表示在满足其它字段的制约条件后每月都执行该命令操作。
 逗号（,）：可以用逗号隔开的值指定一个列表范围，例如，“1,2,5,7,8,9”
 中杠（-）：可以用整数之间的中杠表示一个整数范围，例如“2-6”表示“2,3,4,5,6”
 正斜线（/）：可以用正斜线指定时间的间隔频率，例如“0-23/2”表示每两小时执行一次。同时正斜线可以和星号一起使用，例如*/10，如果用在minute字段，表示每十分钟执行一次。
+```
 
-每1分钟执行一次command  * 20 * * * command
+每1分钟执行一次command  * * * * * command
 每小时的第3和第15分钟执行  3,15 * * * * command
 
 ---
- 
+
 ### S3
 
 #### EMRFS
