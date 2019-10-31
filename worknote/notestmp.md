@@ -1,3 +1,7 @@
+---
+typora-copy-images-to: ../worknote
+---
+
 
 ### Zeppelin
 
@@ -65,7 +69,13 @@ describe formatted external_pro_db.user_trace partition (log_date='2019-10-27');
 Spark GC 问题. 
 http://ju.outofmemory.cn/entry/363883
 https://blog.csdn.net/bmwopwer1/article/details/71947137
+<<<<<<< HEAD
 https://matt33.com/2018/07/28/jvm-cms/
+=======
+
+<https://umbertogriffo.gitbook.io/apache-spark-best-practices-and-tuning/chapter1/dont_collect_large_rdds>
+
+>>>>>>> eb984be4f3128618f42d132709dba9c3f70769a0
 
 1. spark schdeuler delay一直很大. ms schduler delay
 2. coalesce 貌似有时不生效，生效后 105个core,coalesce(100) scheduler delay还是比较大
@@ -173,9 +183,7 @@ INFO - Subtask: 19/10/31 08:49:39 INFO SparkUI: Bound SparkUI to 0.0.0.0, and st
 
 EMR写死了PUBLIC_DNS,嗯, EMR 你真棒！
 
-
-
-
+  
 ---
 
 ### Yarn
@@ -183,19 +191,22 @@ a. 调度类型
    FIFO 先进先出，
    Capacity  https://www.jianshu.com/p/25788c6caf49. 如果队列中的资源有剩余或者空闲，可以暂时共享给那些需要资源的队列，而一旦该队列有新的应用程序需要资源运行，则其他队列释放的资源会归还给该队列（非强制回收）
 
+   Fair调度：跟Capacity的区别？
+
 b. 调度资源类型 ??
 
 record:
 https://zhuanlan.zhihu.com/p/28640358?from_voters_page=true
 https://cloud.tencent.com/developer/article/1195056
 https://cloud.tencent.com/developer/article/1194446
-https://mp.weixin.qq.com/s?__biz=MzUxMDQxMDMyNg==&mid=2247483866&idx=1&sn=7eb0d8e3ef5f8928842e6925084ac6d3&chksm=f9022ae3ce75a3f5c6a2648835c686e93776c4bfe5cdc54865635c8ac757f8464f105818ab46&mpshare=1&scene=1&srcid=1009w3nIiRWdcNNlrg5DWWtV#rd
+<https://mp.weixin.qq.com/s?__biz=MzUxMDQxMDMyNg==&mid=2247483866&idx=1&sn=7eb0d8e3ef5f8928842e6925084ac6d3&chksm=f9022ae3ce75a3f5c6a2648835c686e93776c4bfe5cdc54865635c8ac757f8464f105818ab46&mpshare=1&scene=1&srcid=1009w3nIiRWdcNNlrg5DWWtV#rd>
 
 
 #### 运维相关
 Q：Yarn node unhealthy，导致node下线，1/1 local-dirs are bad: /yarn/nm; 1/1 log-dirs are bad: /var/log/hadoop-yarn/container-logs
 A：相应节点的本地磁盘目录写满，导致报警。 清理相应目录即可
    相关命令：
+
    ```
    df -lh
    sudo du -h --max-depth=1

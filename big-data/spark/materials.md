@@ -1,5 +1,14 @@
 Mateiral
 
+
+
+### Spark Cache
+
+<https://github.com/JerryLead/SparkInternals/blob/master/markdown/6-CacheAndCheckpoint.md>
+
+### Spark Memory
+http://arganzheng.life/spark-executor-memory-management.html
+
 ### Spark SQL
 Catalyst : https://www.youtube.com/watch?v=RmUn5vHlevc
 
