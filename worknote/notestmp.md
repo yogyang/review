@@ -1,6 +1,4 @@
----
-typora-copy-images-to: ../worknote
----
+
 
 
 ### Zeppelin
@@ -69,13 +67,9 @@ describe formatted external_pro_db.user_trace partition (log_date='2019-10-27');
 Spark GC 问题. 
 http://ju.outofmemory.cn/entry/363883
 https://blog.csdn.net/bmwopwer1/article/details/71947137
-<<<<<<< HEAD
 https://matt33.com/2018/07/28/jvm-cms/
-=======
+https://umbertogriffo.gitbook.io/apache-spark-best-practices-and-tuning/chapter1/dont_collect_large_rdds
 
-<https://umbertogriffo.gitbook.io/apache-spark-best-practices-and-tuning/chapter1/dont_collect_large_rdds>
-
->>>>>>> eb984be4f3128618f42d132709dba9c3f70769a0
 
 1. spark schdeuler delay一直很大. ms schduler delay
 2. coalesce 貌似有时不生效，生效后 105个core,coalesce(100) scheduler delay还是比较大
@@ -145,14 +139,14 @@ https://knockdata.github.io/spark-window-function/
 
 ---
 
-a. groupBy
-b. cache源码
-c. Spark堆外内存的使用 
-d. spark dataframe filter => col("gender") === 'F'
-e. repartionBy("c0_1",1000) -> 到底几个partition有数据，数据是如何分布的
-f. spark 读取hive的多级目录失败，
-g. spark locality_level https://www.jianshu.com/p/05034a9c8cae
-h. collect_list with order
+-  groupBy
+- cache源码
+- Spark堆外内存的使用 
+- spark dataframe filter => col("gender") === 'F'
+- repartionBy("c0_1",1000) -> 到底几个partition有数据，数据是如何分布的
+- spark 读取hive的多级目录失败，
+- spark locality_level https://www.jianshu.com/p/05034a9c8cae
+- collect_list with order
 
 
 #### Spark元数据过期
@@ -183,12 +177,27 @@ INFO - Subtask: 19/10/31 08:49:39 INFO SparkUI: Bound SparkUI to 0.0.0.0, and st
 
 EMR写死了PUBLIC_DNS,嗯, EMR 你真棒！
 
+#### Spark application log 在本地的container-logs下没有
+yarn开启了日志聚合，默认把日志聚合后，传到了hdfs上
+https://www.jianshu.com/p/83fcf7478dd7
+yarn logs -applicationId  可以看到所有的container日志
+xxx -containerId xxxx // fail
+
+sed -n '34826,44603p' container_xxx
+
+#### SparkHistory看不到从Zeppelin提交的application
+
+usermod -a -G examplegroup exampleusername
+less /etc/groups
+less /etc/passwd
   
 ---
 
 ### Yarn
+
 a. 调度类型
-   FIFO 先进先出，
+   FIFO 先进先出
+
    Capacity  https://www.jianshu.com/p/25788c6caf49. 如果队列中的资源有剩余或者空闲，可以暂时共享给那些需要资源的队列，而一旦该队列有新的应用程序需要资源运行，则其他队列释放的资源会归还给该队列（非强制回收）
 
    Fair调度：跟Capacity的区别？
@@ -255,6 +264,12 @@ Q：Spark写入S3,目录重写，发生一致性检查错误，集群开启了�
    原因是 有两个应用都在对该s3目录进行操作，一个应用运行在非一致性EMR集群，另一个应用运行在一致性集群。
    EMRFS 支持S3一致性优化实现其实是通过写DynamoDB记录源数据，通过写DynamoDB+s3桶的原子性来保证。
    非一致性集群对DynamoDB的存在无感知，在进行s3删数据时候，无法更新DynamoDB原数据信息
+
+---
+
+### 数据库
+
+https://juejin.im/post/5b6d62ddf265da0f491bd200
 
 
 
