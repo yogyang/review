@@ -146,7 +146,30 @@ https://knockdata.github.io/spark-window-function/
 - repartionBy("c0_1",1000) -> 到底几个partition有数据，数据是如何分布的
 - spark 读取hive的多级目录失败，
 - spark locality_level https://www.jianshu.com/p/05034a9c8cae
-- collect_list with order
+- collect_list with order -> sort_array
+- RDDBarrier
+  ```
+   * An RDD is in a barrier stage, if at least one of its parent RDD(s), or itself, are mapped from
+   * an [[RDDBarrier]]. This function always returns false for a [[ShuffledRDD]], since a
+   * [[ShuffledRDD]] indicates start of a new stage.
+   *
+   * A [[MapPartitionsRDD]] can be transformed from an [[RDDBarrier]], under that case the
+   * [[MapPartitionsRDD]] shall be marked as barrier.
+  ```
+- 有一些stage可以自动被skip -> shuffleDep.shuffleId -> skip or not??
+- TaskMetrics
+- shuffle write 7M -> cache 20.7M -> persist serialized 20.3M. ?
+  RDD.iterator -> RDD.getOrCompute
+  ```
+  private[spark] def getOrCompute(partition: Partition, context: TaskContext): Iterator[T] = {
+    val blockId = RDDBlockId(id, partition.index)
+    var readCachedBlock = true
+    // This method is called on executors, so we need call SparkEnv.get instead of sc.env.
+    SparkEnv.get.blockManager.getOrElseUpdate(blockId, storageLevel, elementClassTag, () => {
+      readCachedBlock = false
+      computeOrReadCheckpoint(partition, context)
+    }) match {
+  ```
 
 
 #### Spark元数据过期
