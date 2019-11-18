@@ -141,6 +141,28 @@ https://knockdata.github.io/spark-window-function/
 
 -  groupBy
 - cache源码
+
+  http://joey771.cn/2018/04/05/spark/spark%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/Spark%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90RDD%E7%BC%93%E5%AD%98%E8%BF%87%E7%A8%8B/
+
+  https://www.ibm.com/developerworks/cn/analytics/library/ba-cn-apache-spark-memory-management/index.html
+
+  private def buildBuffers(): RDD[CachedBatch] = 
+  row里每个列对应一个ColumnBuilder
+  按照列存的方式进行压缩
+
+  ```
+   CachedBatch(rowCount, columnBuilders.map { builder =>
+            JavaUtils.bufferToArray(builder.build())
+          }
+  ```
+
+
+  Spark persist 性能测试：https://blog.csdn.net/u013007900/article/details/79287991
+  https://www.scads.de/images/Events/3rdSummerSchool/Talks/SparkMemory-Salem.pdf
+  https://www.cnblogs.com/johnny666888/p/11210233.html
+  https://blog.csdn.net/huangyuu5/article/details/47081219
+
+
 - Spark堆外内存的使用 
 - spark dataframe filter => col("gender") === 'F'
 - repartionBy("c0_1",1000) -> 到底几个partition有数据，数据是如何分布的
