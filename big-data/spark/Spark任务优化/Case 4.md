@@ -36,7 +36,7 @@ group by a
 
 对应的执行stage图如：
 
-![ case4_1](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/ case4_1.png)
+![ case4_1](https://raw.githubusercontent.com/fuqiliang/review/master/big-data/spark/Spark任务优化/pic/%20case4_1.png)
 
 
 

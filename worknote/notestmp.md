@@ -1,12 +1,4 @@
 ---
-typora-copy-images-to: ../worknote
----
-
-
-
-
-
----
 
 ### hive
 
@@ -46,53 +38,8 @@ https://blog.csdn.net/bmwopwer1/article/details/71947137
    Shuffle Write Size / Shuffle Spill(Memory) / Shuffle Spill(Disk) 
    https://jaceklaskowski.gitbooks.io/mastering-apache-spark/spark-webui-StagePage.html
 
-#### Spark优化案例
 
-  1. 注意中间计算结果重用
-  ```
-  for (i <- 0 util len) {
-  	df = df.withColumn("c"+i, $"value".split(",")(i))
-  }
-  ```
 
- 这类问题会导致大量的重复split产生，且当$value本身数据很大时候，会导致大量的Java临时对象产生，youngGC也会非常严重，改成复用split()的结果，线上从40min -> 10min.
-
- 当业务方由于逻辑过于复杂，不想先进行code review时候，可以先给executor.extraJavaOption传入-Xmn 扩大一下新生代比例，可以稍微解决一下GC的问题。这个案例中有非常有意思的发现，yarn启动的container并不会将Xms=Xmx,xms 默认还是1/64的机器内存，而且貌似JVM在老年代资源一直占据不多时，不会进行堆扩容。这就直接导致了线上任务一直处于可用堆2G，新生代大概500M的状况，加剧了GC的恶化。
-
-  2. 输入数据本身倾斜很大
-    最小16K，最大3.2G,任务数据分配极不均匀，最后job等3.2G的任务执行完就花了35min.
-    将数据先进行repartition(500)后再运算，线上40min -> 20min. 其实单纯的数据repartition并不怎么耗时，在进行复杂的计算之前，越要注意数据均分。
-    
-  3. sql join 小表，嵌套groupby
-      线上一条SQL类似
-  ```
-  select a, sum(price), sum(arrive), sum(xxxx)
-     select a, b, sum(price)
-		  from
-		   (
-		   	select a, c, sum(aColumnName)
-		   	from (
-		   		select a,b,aColumnName
-		   		from t1
-		   		) t2 group by 1,2
-		   ) t3 join dimensionT
-		   on t3.c = dimensionT.c
-	   group by 1,2
-   group by a
-  ```
-这条SQL很有意思，它在SparkUI里对应的SQL图和job stage图分别为
-
-![SQL](/Users/yoga/Documents/workspace/review/worknote/SQL.png)
-
-从SQL图可以看到，触发了SortMergeJoin,对应SQL的 join dimensionT on t3.c = dimensionT.c, 而且dimensionT输入才170M+,另外一张表200G+，也就是大表Join小表。SortMergeJoin会触发两个输入表按照c进行重分布的shuffle，即对应着stage 3 4.
-
-![DAG](/Users/yoga/Documents/workspace/review/worknote/DAG.jpg)
-从job stage图中，可以看出，每次group by 都出发了一次shuffle, 对应stage的5，6，7
-
-这个任务的优化我从两个方面进行考虑
-- 大表join小表，改成broadcast(小表)，即写成df.join(broadcast(dimensionT), "pid")
-- SQL中的每次group by都是以a为开头，那么如果我一开始就把数据按照a进行repartition, 后面所有的group by都将变成窄依赖，将减少3次shuffle
-  
 ---
 
 ### Yarn
