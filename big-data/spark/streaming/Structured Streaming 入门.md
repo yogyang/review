@@ -1,6 +1,19 @@
-typora-copy-images-to: ./streaming/pic
 
-[TOC]
+- [Structured Streaming 入门](#structured-streaming---)
+  * [Sample](#sample)
+  * [结果输出](#----)
+    + [Complete Mode](#complete-mode)
+    + [Update Mode](#update-mode)
+    + [Append Mode](#append-mode)
+    + [WaterMark && Window](#watermark----window)
+  * [GroupState](#groupstate)
+    + [UpdateStateFn](#updatestatefn)
+    + [GroupStateTimeout](#groupstatetimeout)
+      - [ProcessTimeout](#processtimeout)
+      - [EventTimeout](#eventtimeout)
+      - [Timeout 触发](#timeout---)
+  * [Codes](#codes)
+
 ##  Structured Streaming 入门
 
 先读一把[官方指南](https://spark.apache.org/docs/latest/structured-streaming-programming-guide.html#output-modes)
@@ -96,7 +109,7 @@ user2, xxx, xxx
 
 每次都会将全量的数据输出，该模式也只能用在aggregate的情况下。
 
-![image-20191208170707284](/Users/yoga/Documents/workspace/review/big-data/spark/streaming/pic/image-20191208170707284.png)
+![image-20191208170707284](<https://raw.githubusercontent.com/yogyang/review/master/big-data/spark/streaming/pic/image-20191208170707284.png>)
 
 
 
@@ -104,7 +117,7 @@ user2, xxx, xxx
 
  在Batch2以及Batch3中，只输出对应更新过的结果数据
 
-![image-20191208170950940](/Users/yoga/Documents/workspace/review/big-data/spark/streaming/pic/image-20191208170950940.png)
+![image-20191208170950940](<https://raw.githubusercontent.com/yogyang/review/master/big-data/spark/streaming/pic/image-20191208170950940.png>)
 
 
 #### Append Mode
@@ -149,7 +162,7 @@ user2, xxx, xxx
 
 之前的示例是一个无状态的计算，怎么说他无状态呢？之前不也说过中间结果啥的么？
 
-![image-20191208175917468](/Users/yoga/Library/Application Support/typora-user-images/image-20191208175917468.png)
+![image-20191208175917468](https://raw.githubusercontent.com/yogyang/review/master/big-data/spark/streaming/pic//image-20191208175917468.png)
 
 示例计算模型(我理解)可以简单画成如上图，
 
@@ -188,7 +201,7 @@ val finalDF = df
 3. 每次trigger的时候，分别对每个group进行updateStateFn调用, updateStateFn就包含了你要怎么处理这次group  events的逻辑
 4. G1，G1'是跨时间的，那么他们之间共用一个GroupState1来共享一些状态信息，比如k1已经累计了多少个msg event.
 
-![image-20191208182347796](/Users/yoga/Library/Application Support/typora-user-images/image-20191208182347796.png)
+![image-20191208182347796](https://raw.githubusercontent.com/yogyang/review/master/big-data/spark/streaming/pic/image-20191208182347796.png)
 
 每个userId的msg event累计5次，输出一个Payload的示范
 
