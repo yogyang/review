@@ -24,11 +24,9 @@ in/bin/interpreter.sh, -d, /usr/lib/zeppelin/interpreter/spark, -c, 172.31.20.22
 集群A上Zeppelin Spark如何向集群B的yarn提交：
 1. 将B的hadoop conf直接拷到A，A 的hadoop conf 重定向到新conf 
 
-
 ---
 
 ### Glue
-
 
 ---
 
@@ -209,33 +207,8 @@ https://blog.csdn.net/zyzzxycj/article/details/85166571
 Container killed by YARN for exceeding memory limits. 11.1 GB of 11 GB physical memory used. Consider boosting spark.yarn.executor.memoryOverhead or disabling
 ```
 
-#### EMR上SparkUIdriver里打印的ip:host不对
-通过报错发现，ApplicationMaster对应的跳转链接为：http://ip1:4047，而airflow中显示的driver日志如下
-
-INFO - Subtask: 19/10/31 08:49:39 INFO SparkUI: Bound SparkUI to 0.0.0.0, and started at ip1:4047
-
-而通过Airflow调度执行的机器为 ip2，即spark-submit指定的机器IP为ip2,启动模式为yarn-client，所以SparkUI 的访问地址应该是ip2:4047
-查看Spark源码可以发现，
 
 
-查看/usr/lib/spark/conf/spark-env.sh可以看到，
-
-EMR写死了PUBLIC_DNS,嗯, EMR 你真棒！
-
-#### Spark application log 在本地的container-logs下没有
-yarn开启了日志聚合，默认把日志聚合后，传到了hdfs上
-https://www.jianshu.com/p/83fcf7478dd7
-yarn logs -applicationId  可以看到所有的container日志
-xxx -containerId xxxx // fail
-
-sed -n '34826,44603p' container_xxx
-
-#### SparkHistory看不到从Zeppelin提交的application
-
-usermod -a -G examplegroup exampleusername
-less /etc/groups
-less /etc/passwd
-  
 ---
 
 ### Yarn
@@ -293,28 +266,8 @@ minute   hour   day   month   week   command
 
 ---
 
-### S3
 
-#### EMRFS
 
-```
-emrfs sync s3://bucket/folder
-emrfs delete s3://bucket/folder
-emrfs diff s3://bucket/folder
-
-```
-
-#### 运维相关
-Q：Spark写入S3,目录重写，发生一致性检查错误，集群开启了一致性检查
-   原因是 有两个应用都在对该s3目录进行操作，一个应用运行在非一致性EMR集群，另一个应用运行在一致性集群。
-   EMRFS 支持S3一致性优化实现其实是通过写DynamoDB记录源数据，通过写DynamoDB+s3桶的原子性来保证。
-   非一致性集群对DynamoDB的存在无感知，在进行s3删数据时候，无法更新DynamoDB原数据信息
-
----
-
-### 数据库
-
-https://juejin.im/post/5b6d62ddf265da0f491bd200
 
 
 
