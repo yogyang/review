@@ -1,33 +1,3 @@
-
-
-
-### Zeppelin
-
-EMR默认日志：/var/log/xxx
-EMR默认配置:/etc/xxx/conf
-
-启动Spark Interpreter log
-```
-INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} SparkInterpreterLauncher.java[buildEnvFromProperties]:113) - ZEPPELIN_SPARK_CONF:  --master
- yarn-client --conf spark.yarn.dist.archives=/usr/lib/spark/R/lib/sparkr.zip#sparkr --conf spark.jars='s3://jiayun.spark.data/yangjieyu/xgb_lr_
-rank/xgboost4j-0.90.jar,s3://jiayun.spark.data/yangjieyu/xgb_lr_rank/xgboost4j-spark-0.90.jar' --conf spark.executor.memory='8g' --conf spark.y
-arn.isPython=true --conf spark.app.name='Zeppelin-spark' --conf spark.driver.maxResultSize='2g' --conf spark.home='/usr/lib/spark'
- INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} SparkInterpreterLauncher.java[buildEnvFromProperties]:139) - Run Spark under non-secure mod
-e as no keytab and principal is specified
- INFO [2019-10-22 06:03:46,162] ({pool-2-thread-34} RemoteInterpreterManagedProcess.java[start]:115) - Thrift server for callback will start. P
-ort: 35493
- INFO [2019-10-22 06:03:46,663] ({pool-2-thread-34} RemoteInterpreterManagedProcess.java[start]:190) - Run interpreter process [/usr/lib/zeppel
-in/bin/interpreter.sh, -d, /usr/lib/zeppelin/interpreter/spark, -c, 172.31.20.22, -p, 35493, -r, :, -l, /usr/lib/zeppelin/local-repo/spark, -g,
- spark]
-```
-
-集群A上Zeppelin Spark如何向集群B的yarn提交：
-1. 将B的hadoop conf直接拷到A，A 的hadoop conf 重定向到新conf 
-
----
-
-### Glue
-
 ---
 
 ### hive
@@ -209,6 +179,13 @@ Container killed by YARN for exceeding memory limits. 11.1 GB of 11 GB physical 
 
 
 
+<<<<<<< HEAD
+=======
+usermod -a -G examplegroup exampleusername
+less /etc/groups
+less /etc/passwd
+
+>>>>>>> 139f32a2c40158ae167f858778767393dbd176e5
 ---
 
 ### Yarn
