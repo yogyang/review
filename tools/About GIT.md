@@ -51,3 +51,8 @@ git remote rm repo-A-branch
 ### Git clone clone too slow
 
 <https://www.cnblogs.com/cy521/p/10948235.html>
+
+### Fork repo update
+
+https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/syncing-a-fork
+git fetch upstream

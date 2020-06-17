@@ -2,22 +2,55 @@
 marp: true
 # theme: uncover
 # _class: invert
+
 ---
 
-### Contents
+### Before Delta
+
+Your dataset using format `parquet`
+
+Delete Customer with Cid = 250
+
+---
+
+### Before Delta
+
+Steps:
+1. find your target partition if you have one, overwrite that partition
+
+![parquet_update](/Users/yoga/Documents/workspace/review/share/delta/pics/parquet_update.jpg)
+
+
+Problem:
+1. what if failure on parquet_f3 -> You may loss your other 200-300 customers
+2. What if others need to read cid > 250 -> Fail Or Blocked
+
+---
+
+### After Delta
+1. deltaTable.delete($"cid" === "250")
+
+![delta_update](/Users/yoga/Documents/workspace/review/share/delta/pics/parquet_update.jpg)
+
+Pros:
+1. ACID contril on your delete action -> ACID
+2. Downstream can still Read on V1 -> TimeTravel
+
+---
+
+### What's in Delta
 
 1. ACID
 2. Delta Log
 3. Time Travel
-4. Schema change / Data Incremental Change
+4. Schema change
 5. Delta as Streaming Source
-
 
 ---
 
 ### ACID
 
-`overwrite` on `parquet`
+What happened when `overwrite` on `parquet`
 
 > Delete (Mark or Real)
 > Write
@@ -32,8 +65,10 @@ But S3?
 
 ### ACID
 
-1. COMPRESSION
-2. UPDATE/DELTE/MERGE
+Senarios of ACID requirements
+
+1. COMPRESSION: too many small files, two large file numbers are slowing down your query
+2. UPDATE/DELTE/MERGE: what if you have some broken data? stop all your downstreams' read? 
 
 ---
 
@@ -46,41 +81,80 @@ But S3?
       .partitionBy("p")
       .save(s"test_$formatM")
 ```
-Internal:
 
-> DeltaDataSource
--> Sink
--> RelationProvider :
-     WriteIntoDeltaCommand ->  deltaLog.withNewTranscation 
-     -> execute action  -> commit 
+Codes Internal:
+
+```
+deltaLog.withNewTransaction { txn =>
+      val actions = write(txn, sparkSession)
+      val operation = DeltaOperations.Write(mode, Option(partitionColumns), options.replaceWhere)
+      txn.commit(actions, operation)
+    }
+``` 
+
+---
+
+### [Delta Log](https://github.com/delta-io/delta/blob/master/src/main/scala/org/apache/spark/sql/delta/DeltaLog.scala)
+
+- Delta logs is the only truth of what the data is, including raw data, partition, schema
+- Append-only logs, each operation you executed will create a new version log, reflecting your incremental change
+
+
+
+---
+
+### Delta log
+
+![delta_log_structure](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_log_formats.jpg)
+
+
+---
+
+### Delta log
+
+**Format:**
+- json
+- checkpoint.parquet
+- last_checkpoint
+
+> Data File Indexes + Schema = v1.json + v2.json + ... + Vn.json
+
+OR
+
+> Data File Indexes + Schema = Vx.checkpoint.parquet + Vx+1.json + Vx+2.json + ...
 
 ---
 
 ### Delta Log
 
-[Source Code](https://github.com/delta-io/delta/blob/master/src/main/scala/org/apache/spark/sql/delta/DeltaLog.scala)
+![delta_log_contents](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_log_contents.jpg)
 
-![delta_log](/Users/yoga/Desktop/delta_log.jpg)
-- metadata
-- AddFile
-- RemoveFile
+**Contents:**
+- commitInfo : `DESCRIBE HISTORY` 
 
-- json
-- checkpoint.parquet
+- protocol
+- metaData: schema, table-level-config, ..
+- actions: AddFile, RemoveFile
+
 
 ---
 
-### Transcation Do Commit
+### Transcation
 
+Any thing wrapped in
+```
+deltaLog.withNewTransaction {
+   trx => xxxx
+}
+```
+
+Conflict Control:
+https://docs.databricks.com/delta/concurrency-control.html
+
+Codes:
 [DoCommit](https://github.com/delta-io/delta/blob/dc20a2739c19744e91d9047228af584c7ce73993/src/main/scala/org/apache/spark/sql/delta/OptimisticTransaction.scala#L407)
 
-What is a Transcation?
-- DeltaCommand
-- DataFrame API
 
----
-
-![delta_dataset](/Users/yoga/Desktop/delta_dataset.jpg)
 
 ---
 
@@ -94,56 +168,68 @@ What is a Transcation?
 deltaLog.getSnapshotAt(1990)
 ```
 
-* delta_logs 
-![versions](/Users/yoga/Desktop/versions.jpg)
+Main logic is:
+* Combining different delta_logs 
+* You can only travel back the your oldest delta log checkpoint
 
-Current Snapshot -> Gather Latest Versions -> Valid Files
+V4 = V0.json+ V1.json + V2.json + V3.json + V4.json
+V2 = V0.json+ V1.json + V2.json
 
 --- 
 
 ### Schema Change
 
+https://docs.databricks.com/delta/delta-batch.html#schema-validation-1
+
 [Codes](https://github.com/delta-io/delta/blob/dc20a2739c19744e91d9047228af584c7ce73993/src/main/scala/org/apache/spark/sql/delta/schema/ImplicitMetadataOperation.scala#L50)
 
-- current: DataType (From transction snashot), update: DataType (Your wrote data)
+- current: DataType (From transction snapshot), update: DataType (data Your wrote)
 - conversion on read
 
 ---
 
 ### Data Change
 
-* GDPR
+* API Support: Update/Merge/Delete
 
-Update/Merge/Delete
+* Change on Write, Comparing to Hudi, merge on Read, write on Avro
 
-* Change on Write
-
-Compared to Hudi
-
-* Change on Read, Write on Avro
 
 ---
 
 ### Datalake Comparison
 
-![versions](/Users/yoga/Desktop/data_lake.jpg)
+![comparison](/Users/yoga/Documents/workspace/review/share/delta/pics/datalake_compare.jpg)
 
 ---
 
-### Delta as Streaming Source
+### [Delta as Streaming Source](https://github.com/delta-io/delta/tree/master/src/main/scala/org/apache/spark/sql/delta/sources)
 
-[Related Codes](https://github.com/delta-io/delta/tree/master/src/main/scala/org/apache/spark/sql/delta/sources)
+![streaming_checkpoint](/Users/yoga/Documents/workspace/review/share/delta/pics/streaming_checkpoint.jpg)
+
+**Key Point Here: OffSets**
+- KafaOffset:
+![kafka_offset](/Users/yoga/Documents/workspace/review/share/delta/pics/kafka_offset.jpg)
+
+
+- DeltaSourceOffset
+![versions](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_offset.jpg)
+   
+---
+
+### Delta As Streaming source
+
+- DeltaSourceOffset:
+ > reservoirVersion: The version of the table that we are current processing.
+index: The index in the sequence of AddFiles in this version. 
 
 - GetBatch: [GetBatch](https://github.com/delta-io/delta/blob/dc20a2739c19744e91d9047228af584c7ce73993/src/main/scala/org/apache/spark/sql/delta/sources/DeltaSource.scala#L269)
   
    - Only AddFiles & isDataChange=true are passed
+   - Overwrite/Update/Delete on-no-partition will genereate AddFile too
 
-- DeltaSourceOffset
-![versions](/Users/yoga/Desktop/delta_offset.jpg)
-
-All is DeltaLog
-
-But still be carefull on deduplicate
+**All is based on DeltaLog**
+**But still be carefull on deduplicate**
 
 ---
 
