@@ -18,7 +18,7 @@ Delete Customer with Cid = 250
 Steps:
 1. find your target partition if you have one, overwrite that partition
 
-![parquet_update](/Users/yoga/Documents/workspace/review/share/delta/pics/parquet_update.jpg)
+![parquet_update](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/parquet_update.jpg)
 
 
 Problem:
