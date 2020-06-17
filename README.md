@@ -8,4 +8,4 @@
 
 [Quick understanding of sbt](https://yogyang.github.io/review/share/sbt/)
 
-[Streaming System 1-3](https://yogyang.github.io/review/share/streaming_system_1_3)
+[Streaming System 1-3](https://yogyang.github.io/review/share/streaming_system_1_3/)
