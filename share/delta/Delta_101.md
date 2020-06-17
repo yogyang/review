@@ -30,7 +30,7 @@ Problem:
 ### After Delta
 1. deltaTable.delete($"cid" === "250")
 
-![delta_update](/Users/yoga/Documents/workspace/review/share/delta/pics/parquet_update.jpg)
+![delta_update](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/parquet_update.jpg)
 
 Pros:
 1. ACID contril on your delete action -> ACID
@@ -105,7 +105,7 @@ deltaLog.withNewTransaction { txn =>
 
 ### Delta log
 
-![delta_log_structure](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_log_formats.jpg)
+![delta_log_structure](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/delta_log_formats.jpg)
 
 
 ---
@@ -127,7 +127,7 @@ OR
 
 ### Delta Log
 
-![delta_log_contents](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_log_contents.jpg)
+![delta_log_contents](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/delta_log_contents.jpg)
 
 **Contents:**
 - commitInfo : `DESCRIBE HISTORY` 
@@ -199,21 +199,21 @@ https://docs.databricks.com/delta/delta-batch.html#schema-validation-1
 
 ### Datalake Comparison
 
-![comparison](/Users/yoga/Documents/workspace/review/share/delta/pics/datalake_compare.jpg)
+![comparison](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/datalake_compare.jpg)
 
 ---
 
 ### [Delta as Streaming Source](https://github.com/delta-io/delta/tree/master/src/main/scala/org/apache/spark/sql/delta/sources)
 
-![streaming_checkpoint](/Users/yoga/Documents/workspace/review/share/delta/pics/streaming_checkpoint.jpg)
+![streaming_checkpoint](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/streaming_checkpoint.jpg)
 
 **Key Point Here: OffSets**
 - KafaOffset:
-![kafka_offset](/Users/yoga/Documents/workspace/review/share/delta/pics/kafka_offset.jpg)
+![kafka_offset](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/kafka_offset.jpg)
 
 
 - DeltaSourceOffset
-![versions](/Users/yoga/Documents/workspace/review/share/delta/pics/delta_offset.jpg)
+![versions](https://raw.githubusercontent.com/yogyang/review/master/share/delta/pics/delta_offset.jpg)
    
 ---
 
