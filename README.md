@@ -1,11 +1,14 @@
 # Table of contents
 
-* [README](docs/README.md)
+## docs
 
-## what's this
+* [2022] (docs/2022)
+* [2020] (docs/2020)
+* [2019] (docs/2019)
 
-* [slide 1](docs/whats-this/slide-1/README.md)
-  * [Page 3](docs/whats-this/slide-1/page-3.md)
-* [slide 2](docs/whats-this/slide-2.md)
-* [Page 2](docs/whats-this/page-2.md)
-* [Page 1](docs/whats-this/page-1.md)
+## slides
+
+* [Spark2+ workflow and shuffle](https://yogyang.github.io/review/share/spark/)
+* [Quick understanding of sbt](https://yogyang.github.io/review/share/sbt/)
+* [Streaming System 1-3](https://yogyang.github.io/review/share/streaming_system_1_3/)
+* [Delta 101](https://yogyang.github.io/review/share/delta/)
