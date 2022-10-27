@@ -5,6 +5,7 @@
 * [2022](docs/README.md)
   * [流计算的实际案例](docs/docs/2022/liu-ji-suan-de-shi-ji-an-li.md)
   * [从delta + optimize + gen\_manifest的bug聊起(1)](docs/docs/2022/cong-delta-+-optimize-+-genmanifest-de-bug-liao-qi-1.md)
+  * [从delta + optimize + gen\_manifest的bug聊起(2)](docs/docs/2022/cong-delta-+-optimize-+-genmanifest-de-bug-liao-qi-2.md)
 * [2020](docs/docs/2020/README.md)
   * [Delta\_101](docs/docs/2020/delta\_101.md)
 * [2019](docs/docs/2019/README.md)

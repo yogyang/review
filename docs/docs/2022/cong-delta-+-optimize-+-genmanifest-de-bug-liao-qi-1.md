@@ -33,11 +33,11 @@ delta.compatibility.symlinkFormatManifest.enabled=true
 
 这条命令执行提交了3个commit，&#x20;
 
-![](<../../.gitbook/assets/image (6).png>)
+![](<../../.gitbook/assets/image (2).png>)
 
 而从gen\_manifest日志里，也可以看到这3个commit对应触发的manifest更新
 
-![](../../.gitbook/assets/image.png)
+![](<../../.gitbook/assets/image (7).png>)
 
 这里值得注意的是，commit1 和 commit2都更新了同一个partition, date=2022-06-28/hour=17.
 
