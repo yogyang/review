@@ -81,4 +81,25 @@ deltaTable.optimize().executeCompaction()
 
 所以，同样逻辑的代码在databricks DBC11.3上跑了一遍
 
-![](<../../.gitbook/assets/image (6).png>)
+<img src="../../.gitbook/assets/image (6).png" alt="" data-size="original">
+
+<img src="../../.gitbook/assets/image (7).png" alt="" data-size="original">
+
+从history来看，会发现
+
+1. 商业版的Optimize指标上都多个了\`batchId:0\`, 而执行的job description也会变成
+2. Batch x Compactingxxx , 而且也不是默认的1 task执行合并了。
+
+而在我的测试中，应该file size并没有达到他进行batch拆分的标准，不过从optimize commit里有batchId来看，商业版的行为还是拆分出来的batch是一个commit.
+
+也就是目前线上在单次optimize数据量特别大的时候，出现的情况。
+
+
+
+#### 总结
+
+这个问题记录下来，总结一下，又一个感慨。
+
+就是购买商业服务省去了许多运维成本，同时他与开源的不统一，其实让我们开发使用者在排查问题时，还是需要依赖于商业支持。
+
+有些问题，就不是你自己能够coding搞定了。
